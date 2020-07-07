@@ -1,0 +1,197 @@
+import React, {Component} from 'react';
+import ReactDOM from 'react-dom';
+import screenfull from 'screenfull';
+import './App.css';
+import loadinggif from './loading.gif'
+
+class Player extends Component
+{
+    state = {tree : null, current_video: null, final: false}
+
+    async componentDidMount()
+    {
+        var jsontree = await fetch("https://interact-videos.s3.eu-central-1.amazonaws.com/selection_trees/" + this.props.tree_id + ".json").then(r => r.json());
+        //temporary solution: fixing portait videos overflowing viewport
+        document.getElementById("video-src").style.maxHeight = String(window.innerHeight * 0.96) + "px"
+        this.setState({tree : jsontree, current_video: "start", final: false})
+        this.handleEvent("start")
+
+    }
+
+    render() {
+        return (<div className="container" id="video1">
+        <div id="video-comp" className="c-video">
+            <img width="140" height="142" id="buffering" className="buffering hidden" src={loadinggif}/>
+            <video id="video-src" src={this.fetchVideo()} onLoadStart={() => document.getElementById("buffering").className = "buffering"} onCanPlay={() => document.getElementById("buffering").className = "buffering hidden"} onWaiting={() => document.getElementById("buffering").className = "buffering"} onPlaying={() => this.checkChoiceShow()} className="video" onEnded={() => this.endFunction()} autoPlay></video>
+            <div id="choice-time-ran-out" className="pop-up-msg hidden">No choice was made in the time limit, a random choice was selected.</div>
+            <div className="hidden" id="choices">
+            <div id="inner-choices"></div>
+            <div class="timer-bar">
+            <div id="timer-fill" class="timer-fill"/>
+            </div>
+            </div>
+            <div class="controls">
+                <div class="buttons">
+                    <button onClick={() => this.handlePlayButton()} id="play-pause" className="pause"/>
+                    <button onClick={() => document.getElementById("video-src").currentTime = document.getElementById("video-src").currentTime - 10} id="rewind" className="rewind"/>
+                    <button onClick={() => this.handleFullScreen()} id="fullscreen" className="fullscreen"/>
+                </div>
+            </div>
+        </div>
+        <div style={{display: "none"}} id="end-title">
+            <h2>The content has ended.</h2>
+            <button onClick={() => this.props.app_parent.setState({ mode: "browse", tree_id: null })}>Return to main menu</button>
+        </div>
+       </div>
+    )
+    };
+
+    handleFullScreen()
+    {
+        if (screenfull.isEnabled) {
+            screenfull.request(document.getElementById("video-comp"));
+        }
+    }
+
+    handleEvent(vidid)
+    {
+        console.log(vidid)
+        if(vidid == "start")
+        {
+            if(this.state.tree.start_video.event)
+            {
+                if (this.state.tree.start_video.event.type == "choice") this.produceChoices(vidid)
+            }
+        }
+        else
+        {
+            var vidobj = this.findVideoPathObject(vidid)
+
+            if(vidobj.event)
+            {
+                if (vidobj.event.type == "choice") this.produceChoices(vidid)
+            }
+        }
+    }
+
+    changeCurrentVideo(vidid)
+    {
+        document.getElementById("choices").className = "hidden";
+        ReactDOM.unmountComponentAtNode(document.getElementById("inner-choices"))
+        if(this.findVideoPathObject(vidid).event) this.setState({tree : this.state.tree, current_video: vidid, final: false})
+        else this.setState({tree : this.state.tree, current_video: vidid, final: true})
+        this.handleEvent(vidid)
+    }
+
+    checkChoiceShow()
+    {
+        var vidobj = null;
+        if(this.state.current_video == "start") vidobj = this.state.tree.start_video;
+        else vidobj = this.findVideoPathObject(this.state.current_video)
+        var vidduration = document.getElementById("video-src").duration
+        if(vidobj.event)
+        {
+            setTimeout(() => this.showChoices(vidobj.event.duration),(vidduration - vidobj.event.duration) * 1000)
+        }
+    }
+
+    produceChoices(vidid)
+    {
+        var vidobj = null;
+        if(vidid == "start") vidobj = this.state.tree.start_video;
+        else vidobj = this.findVideoPathObject(vidid)
+        var temp_choices = <div id="temp-choices"><button gateway={vidobj.event.gateway.one} id="decision1" onClick={e => this.changeCurrentVideo(e.target.getAttribute("gateway"))} className="decision decision1">{vidobj.event.choices.one}</button>
+        <button gateway={vidobj.event.gateway.two} id="decision2" onClick={e => this.changeCurrentVideo(e.target.getAttribute("gateway"))} className="decision decision2">{vidobj.event.choices.two}</button></div>
+        ReactDOM.render(temp_choices,document.getElementById("inner-choices"))
+    }
+
+    handlePlayButton()
+    {
+        var button = document.getElementById("play-pause")
+        if(button.className == 'play') {
+            document.getElementById("video-src").play()
+            button.className = 'pause';
+        } else {
+            document.getElementById("video-src").pause()
+            button.className = 'play';
+        }
+    }
+
+    showChoices(time)
+    {
+        document.getElementById("choices").className = "shown";
+        this.setTimer(time)
+    }
+
+    choiceDurationEnded()
+    {
+        var vidobj = null;
+        if(this.state.current_video == "start") vidobj = this.state.tree.start_video;
+        else vidobj = this.findVideoPathObject(this.state.current_video)
+
+        var rand = Math.floor(Math.random() * 2) + 1;
+
+        if(vidobj.event)
+        {
+            if(rand == 1) this.changeCurrentVideo(vidobj.event.gateway.one)
+            else if(rand == 2) this.changeCurrentVideo(vidobj.event.gateway.two)
+        }
+
+        document.getElementById("choice-time-ran-out").className = "pop-up-msg shown"
+        setTimeout(() => document.getElementById("choice-time-ran-out").className = "pop-up-msg hidden",3000)
+
+    }
+
+    setTimer(time)
+    {
+        var fullamount = time * 1000;
+        var amount = time * 1000;
+        var interval = setInterval(() => 
+        {
+            amount -= 15;
+            if(amount < 0)
+            {
+                console.log("choice duration ended");
+                clearInterval(interval);
+            }
+            else document.getElementById("timer-fill").style.width = (amount/fullamount * 100) + "%"
+        },15)
+    }
+
+    fetchVideo()
+    {
+        if(this.state.current_video)
+        {
+            if(this.state.current_video == "start")
+            {
+               return "https://interact-videos.s3.eu-central-1.amazonaws.com/" + this.state.tree.start_video.id;
+            }
+            else return "https://interact-videos.s3.eu-central-1.amazonaws.com/" + this.state.current_video;
+        }
+    }
+
+    findVideoPathObject(vidid)
+    {
+        for(var i = 0; i < this.state.tree.videos.length; i++)
+        {
+            if(this.state.tree.videos[i].id == vidid) return this.state.tree.videos[i]
+        }
+
+        return null;
+    }
+
+    endFunction()
+    {
+        if(this.state.final == true)
+        {
+           document.getElementById("video-comp").style.display = "none";
+           document.getElementById("end-title").style.display = "inline";
+        }
+        else {
+           this.choiceDurationEnded()
+        }
+
+    }
+}
+
+export default Player;

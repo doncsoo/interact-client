@@ -1,0 +1,56 @@
+{
+    "start_video": 
+    {
+        "title": "",
+        "id": "COWC6",
+        "event": 
+        {
+            "type": "choice",
+            "duration": 10,
+            "choices":
+            {
+                "one": "Békafüttyben ivás",
+                "two": "Vissza a szállásra"
+            },
+            "gateway":
+            {
+                "one": "AB5G6",
+                "two": "9G2TZ"
+            }
+
+        }
+    },
+    "videos":
+    [
+        {
+            "title": "",
+            "id": "AB5G6",
+            "event": null
+        },
+        {
+            "title": "",
+            "id": "9G2TZ",
+            "event":
+            {
+                "type": "choice",
+                "duration": 10,
+                "choices":
+                {
+                    "one": "Menj Krisztiánhoz",
+                    "two": "Menj Krisztiánhoz"
+                },
+                "gateway":
+                {
+                    "one": "KR137",
+                    "two": "KR137"
+                }
+    
+            }
+        },
+        {
+            "title": "",
+            "id": "KR137",
+            "event": null
+        }
+    ]
+}

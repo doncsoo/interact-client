@@ -1,3 +1,7 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+
+@import url('https://fonts.googleapis.com/css2?family=Archivo+Narrow&display=swap');
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -10,4 +14,182 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+.container {
+  display: flex;
+  background-color: rgb(42, 42, 42);
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+p{
+  max-height: 100px;
+  max-width: 600px;
+}
+
+h2{
+  color: white;
+}
+
+div#choices
+{
+  transition: opacity 0.5s linear;
+}
+
+.shown
+{
+  opacity: 1;
+}
+
+.hidden
+{
+  opacity: 0;
+}
+
+.decision {
+  position: absolute;
+  display: flex;
+  width: 300px;
+  background-color: rgba(0,0,0,0.7);
+  padding: 10px;
+  height: 10vh;
+  color: white;
+  justify-content: center;
+  align-items: center;
+  margin: auto;
+  font-family: 'Bebas Neue', cursive;
+  font-size: 200%;
+}
+
+.decision1{
+  right: 60%;
+  top: 70%;
+}
+
+.decision2 {
+  right: 15%;
+  top: 70%;
+}
+
+.decision:hover {
+  position: absolute;
+  display: flex;
+  min-width: 300px;
+  background-color:rgba(53, 49, 49, 0.7);
+  padding: 10px;
+  height: 10vh;
+  color: white;
+  justify-content: center;
+  align-items: center;
+  margin: auto;
+  font-family: 'Bebas Neue', cursive;
+  font-size: 200%;
+}
+
+.pop-up-msg {
+  position: absolute;
+  display: flex;
+  width: 250px;
+  background-color: rgba(0,0,0,0.7);
+  padding: 10px;
+  right: 75%;
+  top: 5%;
+  height: 8vh;
+  color: white;
+  justify-content: center;
+  align-items: center;
+  margin: auto;
+  font-family: 'Archivo Narrow', sans-serif;
+  font-size: 100%;
+  transition: opacity 0.5s linear;
+}
+
+.buffering
+{
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%,-50%);
+}
+
+.loadingside
+{
+  display: flex;
+  background-color: rgb(42, 42, 42);
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.video {
+  width: 100%;
+}
+
+.buttons {
+  padding: 10px;
+}
+
+.buttons button {
+  background: none;
+  border: none;
+  outline: 0;
+  cursor: pointer;
+
+}
+
+.buttons button.play:before {
+  content: url(play-button.svg); 
+}
+
+.buttons button.pause:before {
+  content: url(pause.svg);
+}
+
+.buttons button.rewind:before {
+  content: url(rewind.svg);
+}
+
+.buttons button.fullscreen:before {
+  content: url(full-screen.png);
+  position: absolute;
+  right: 2%;
+  top: 10%;
+}
+
+.c-video {
+  width: 100%;
+  max-width: 1080px;
+  position: relative;
+  overflow: hidden;
+}
+
+.c-video:hover .controls {
+  transform: translateY(0);
+}
+
+.controls   {
+  display: flex;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  flex-wrap: wrap;
+  background-color: rgba(0,0,0,0.7);
+  transform: translateY(100%) translateY(-5px);
+  transition: all .2s;
+}
+
+.timer-bar {
+  height: 10px;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0);
+}
+
+.timer-fill {
+  height: 10px;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.801);
 }
