@@ -11,6 +11,14 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+label {
+  display: block;
+}
+
+.App {
+  position: relative;
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
@@ -29,7 +37,7 @@ p{
   max-width: 600px;
 }
 
-h2{
+h2, h3{
   color: white;
 }
 
@@ -192,4 +200,50 @@ div#choices
   height: 10px;
   width: 100%;
   background-color: rgba(255, 255, 255, 0.801);
+}
+
+.black-header {
+  width: 100%;
+  background-color: black;
+  height: 50px;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.logo {
+  margin-top: 0;
+  margin-bottom: 0;
+  position: absolute;
+  left: 2%;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.log-in {
+  margin-top: 0;
+  margin-bottom: 0;
+  position: absolute;
+  left: 90%;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.content-body {
+  position: absolute;
+  top: 75px;
+  left: 50%;
+  transform: translate(-50%, 0%);
+}
+
+.search-bar {
+  min-width: 400px;
+  width: 800px;
+  height: 30px;
+  font-size: large;
+  margin-bottom: 10px;
+}
+
+#video-button {
+  display: flex;
 }

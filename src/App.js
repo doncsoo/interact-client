@@ -7,11 +7,17 @@ import {
 } from 'react-router-dom'
 import './App.css';
 import Player from './player';
+import VideoButton from './video-button'
 
 class App extends Component
 {
 
   state = {mode: "browse", tree_id: null}
+
+  componentDidMount()
+  {
+    this.queryVideos();
+  }
 
   render()
   {
@@ -23,9 +29,13 @@ class App extends Component
           <Player/>
           </Route>
           <Route path="">
-         <label><b>Upload test</b></label>
+         <div className="black-header">
+         <h2 className="logo">INTERACT</h2>
+         <h3 className="log-in"><a>Log In</a></h3>
+         </div>
+         {/*<label><b>Upload test</b></label>
          <br></br>
-         {/*<input type="file" id="upload-file"/>
+         <input type="file" id="upload-file"/>
          <br></br>
          <label>Name</label>
          <input type="text" id="upload-name"/>
@@ -34,11 +44,11 @@ class App extends Component
          <textarea id="upload-desc" rows="4" cols="50"/>
           <button onClick={() => this.getRequest()}>Send</button>
         <label id="link"></label>*/}
+         <div className="content-body">
+         <input className="search-bar" type="text" size="30" placeholder="Search for some content..."/>
           <br></br>
-          <label><b>All videos</b></label>
-          <div id="all-videos">
-          </div>
-          <button onClick={() => this.queryVideos()} >Get all videos</button>
+          <div id="all-videos"/>
+         </div>
           </Route>
           </Switch>
           </div>
@@ -110,13 +120,15 @@ async queryVideos()
   var entries = []
   for(var i = 0 ; i < resp.length; i++)
   {
-    entries.push(<div><h3>{resp[i].name}</h3><h5>{resp[i].upload_date}</h5><button id={resp[i].tree_id} onClick={e => this.initPlayer(e.target.id)}>Link a videóhoz</button><label>{resp[i].description}</label></div>)
+    //entries.push(<div><h3>{resp[i].name}</h3><h5>{resp[i].upload_date}</h5><button id={resp[i].tree_id} onClick={e => this.initPlayer(e.target.id)}>Link a videóhoz</button><label>{resp[i].description}</label></div>)
+    entries.push(<VideoButton tree_id={resp[i].tree_id} initPlayer={(tree) => this.initPlayer(tree)} title={resp[i].name} creator={resp[i].owner} upload_date={resp[i].upload_date} description={resp[i].description} preview_id={resp[i].preview_id}/>)
   }
   ReactDOM.render(entries,document.getElementById("all-videos"))
 }
 
 initPlayer(treeid)
 {
+  console.log("Launching video...")
   this.setState({ mode: "video_play", tree_id: treeid });
 }
 }
