@@ -25,7 +25,18 @@
         {
             "title": "",
             "id": "AB5G6",
-            "event": null
+            "event":
+            {
+                "type": "butterfly",
+                "required_choices":
+                [
+                    "Békafüttybe ivás"
+                ],
+                "gateway":
+                [
+                    "KR137"
+                ]
+            }
         },
         {
             "title": "",

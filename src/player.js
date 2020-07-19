@@ -6,16 +6,15 @@ import loadinggif from './loading.gif'
 
 class Player extends Component
 {
-    state = {tree : null, current_video: null, final: false}
+    state = {tree : null, current_video: null, final: false, choices: []}
 
     async componentDidMount()
     {
         var jsontree = await fetch("https://interact-videos.s3.eu-central-1.amazonaws.com/selection_trees/" + this.props.tree_id + ".json").then(r => r.json());
         //temporary solution: fixing portait videos overflowing viewport
         document.getElementById("video-src").style.maxHeight = String(window.innerHeight * 0.96) + "px"
-        this.setState({tree : jsontree, current_video: "start", final: false})
+        this.setState({tree : jsontree, current_video: "start", final: false, choices: []})
         this.handleEvent("start")
-
     }
 
     render() {
@@ -48,11 +47,11 @@ class Player extends Component
 
     handleFullScreen()
     {
-        if (screenfull.isEnabled) {
-            screenfull.request(document.getElementById("video-comp"));
-        }
+        if (screenfull.isEnabled) screenfull.request(document.getElementById("video-comp"));
+        else screenfull.exit()
     }
 
+    //Optimize required
     handleEvent(vidid)
     {
         console.log(vidid)
@@ -65,7 +64,7 @@ class Player extends Component
         }
         else
         {
-            var vidobj = this.findVideoPathObject(vidid)
+            let vidobj = this.findVideoPathObject(vidid)
 
             if(vidobj.event)
             {
@@ -74,34 +73,39 @@ class Player extends Component
         }
     }
 
-    changeCurrentVideo(vidid)
+    //optional: optimize setting react state
+    changeCurrentVideo(vidid,choice)
     {
+        let new_choices = this.state.choices
+        if(choice) new_choices.push(choice)
         document.getElementById("choices").className = "hidden";
         ReactDOM.unmountComponentAtNode(document.getElementById("inner-choices"))
-        if(this.findVideoPathObject(vidid).event) this.setState({tree : this.state.tree, current_video: vidid, final: false})
-        else this.setState({tree : this.state.tree, current_video: vidid, final: true})
+        if(this.findVideoPathObject(vidid).event) this.setState({tree : this.state.tree, current_video: vidid, final: false, choices: new_choices})
+        else this.setState({tree : this.state.tree, current_video: vidid, final: true, choices: new_choices})
         this.handleEvent(vidid)
     }
 
+    //Optimize
     checkChoiceShow()
     {
-        var vidobj = null;
+        let vidobj = null;
         if(this.state.current_video == "start") vidobj = this.state.tree.start_video;
         else vidobj = this.findVideoPathObject(this.state.current_video)
-        var vidduration = document.getElementById("video-src").duration
+        let vidduration = document.getElementById("video-src").duration
         if(vidobj.event)
         {
             setTimeout(() => this.showChoices(vidobj.event.duration),(vidduration - vidobj.event.duration) * 1000)
         }
     }
 
+    //Optimize
     produceChoices(vidid)
     {
         var vidobj = null;
         if(vidid == "start") vidobj = this.state.tree.start_video;
         else vidobj = this.findVideoPathObject(vidid)
-        var temp_choices = <div id="temp-choices"><button gateway={vidobj.event.gateway.one} id="decision1" onClick={e => this.changeCurrentVideo(e.target.getAttribute("gateway"))} className="decision decision1">{vidobj.event.choices.one}</button>
-        <button gateway={vidobj.event.gateway.two} id="decision2" onClick={e => this.changeCurrentVideo(e.target.getAttribute("gateway"))} className="decision decision2">{vidobj.event.choices.two}</button></div>
+        var temp_choices = <div id="temp-choices"><button gateway={vidobj.event.gateway.one} id="decision1" onClick={e => this.changeCurrentVideo(e.target.getAttribute("gateway"),e.target.innerHTML)} className="decision decision1">{vidobj.event.choices.one}</button>
+        <button gateway={vidobj.event.gateway.two} id="decision2" onClick={e => this.changeCurrentVideo(e.target.getAttribute("gateway"),e.target.innerHTML)} className="decision decision2">{vidobj.event.choices.two}</button></div>
         ReactDOM.render(temp_choices,document.getElementById("inner-choices"))
     }
 
@@ -123,30 +127,51 @@ class Player extends Component
         this.setTimer(time)
     }
 
+    //Optimize
     choiceDurationEnded()
     {
-        var vidobj = null;
+        let vidobj = null;
         if(this.state.current_video == "start") vidobj = this.state.tree.start_video;
         else vidobj = this.findVideoPathObject(this.state.current_video)
 
-        var rand = Math.floor(Math.random() * 2) + 1;
-
         if(vidobj.event)
         {
-            if(rand == 1) this.changeCurrentVideo(vidobj.event.gateway.one)
-            else if(rand == 2) this.changeCurrentVideo(vidobj.event.gateway.two)
+            if(vidobj.event.type == "choice") this.randomizeSelection(vidobj)
+            if(vidobj.event.type == "butterfly") this.getButterflyResult(vidobj)
         }
+    }
+
+    getButterflyResult(vidobj)
+    {
+        for(let j = 0; j < vidobj.event.required_choices.length; j++)
+        {
+            if(this.state.choices.contains(vidobj.event.required_choices[j]))
+            {
+                this.changeCurrentVideo(vidobj.event.gateway[j],null)
+                return
+            } 
+        }
+        //MIGHT need to revise this if rewind function is implemented
+        this.setState({final: true})
+        this.endFunction()
+    }
+
+    randomizeSelection(vidobj)
+    {
+        let rand = Math.floor(Math.random() * 2) + 1;
+
+        if(rand == 1) this.changeCurrentVideo(vidobj.event.gateway.one)
+        else if(rand == 2) this.changeCurrentVideo(vidobj.event.gateway.two)
 
         document.getElementById("choice-time-ran-out").className = "pop-up-msg shown"
         setTimeout(() => document.getElementById("choice-time-ran-out").className = "pop-up-msg hidden",3000)
-
     }
 
     setTimer(time)
     {
-        var fullamount = time * 1000;
-        var amount = time * 1000;
-        var interval = setInterval(() => 
+        let fullamount = time * 1000;
+        let amount = time * 1000;
+        let interval = setInterval(() => 
         {
             amount -= 15;
             if(amount < 0)
@@ -170,9 +195,10 @@ class Player extends Component
         }
     }
 
+    //!!!Rewrite this to support start video object return
     findVideoPathObject(vidid)
     {
-        for(var i = 0; i < this.state.tree.videos.length; i++)
+        for(let i = 0; i < this.state.tree.videos.length; i++)
         {
             if(this.state.tree.videos[i].id == vidid) return this.state.tree.videos[i]
         }
