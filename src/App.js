@@ -16,7 +16,12 @@ class App extends Component
 
   componentDidMount()
   {
-    this.queryVideos();
+    if(this.state.mode == "browse") this.queryVideos();
+  }
+
+  componentDidUpdate()
+  {
+    if(this.state.mode == "browse") this.queryVideos();
   }
 
   render()
