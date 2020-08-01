@@ -43,7 +43,7 @@ class Player extends Component
         </div>
         <div style={{display: "none"}} id="end-title">
             <h2>The content has ended.</h2>
-            <button onClick={() => this.props.app_parent.setState({ mode: "browse", tree_id: null })}>Return to main menu</button>
+            <button onClick={() => this.props.app_parent.setState({ mode: "browse", tree_id: null, user: this.props.app_parent.state.user })}>Return to main menu</button>
         </div>
        </div>
     )
