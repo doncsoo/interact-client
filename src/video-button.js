@@ -11,7 +11,7 @@ class VideoButton extends Component
   render()
   {
       return (
-          <div onClick={() => this.props.initPlayer(this.props.tree_id)} id="video-button">
+          <div onClick={() => this.props.initPlayer(this.props.tree_id,this.props.vid_id)} id="video-button">
           <img id="preview" width="200px" height="120px"></img>
           <label style={{paddingBottom: "5px", paddingLeft: "5px"}}><b>{this.props.title}</b></label>
           <label style={{display: "none"}}>By: {this.props.creator}</label>

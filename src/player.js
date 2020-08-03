@@ -2,7 +2,8 @@ import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import screenfull from 'screenfull';
 import './App.css';
-import loadinggif from './loading.gif'
+import loadinggif from './loading.gif';
+import like from './like.svg';
 
 class Player extends Component
 {
@@ -13,6 +14,7 @@ class Player extends Component
         var jsontree = await fetch("https://interact-videos.s3.eu-central-1.amazonaws.com/selection_trees/" + this.props.tree_id + ".json").then(r => r.json());
         //temporary solution: fixing portait videos overflowing viewport
         document.getElementById("video-src").style.maxHeight = String(window.innerHeight * 0.85) + "px"
+        this.getLikes();
         this.setState({tree : jsontree, current_video: "start", final: false, choices: [], time_when_choice: null})
         this.handleEvent("start")
     }
@@ -21,9 +23,12 @@ class Player extends Component
         return (<div className="container" id="video1">
         <div id="video-comp" className="c-video">
         <div id="header">
-        <button onClick={() => this.props.app_parent.setState({ mode: "browse", tree_id: null })}>Exit</button>
-        <h2>{!this.state.tree ? null : this.state.tree.video_title}</h2>
+        <button onClick={() => this.props.app_parent.setState({ mode: "browse", vid_id: null, tree_id: null, user: this.props.app_parent.state.user })}>Exit</button>
+        <h2 style={{marginBottom: "1px"}}>{!this.state.tree ? null : this.state.tree.video_title}</h2>
+        <img style={{display: "inline", paddingRight: "10px"}} src={like}/>
+        <h3 id="like-indicator" style={{display: "inline"}}>-</h3>
         </div>
+        <div id="video-container">
             <img width="140" height="142" id="buffering" className="buffering hidden" src={loadinggif}/>
             <video id="video-src" src={this.fetchVideo()} onLoadStart={() => document.getElementById("buffering").className = "buffering"} onCanPlay={() => document.getElementById("buffering").className = "buffering hidden"} onWaiting={() => document.getElementById("buffering").className = "buffering"} onPlaying={() => this.getChoiceShowDuration()}  className="video" onEnded={() => this.endFunction()} onTimeUpdate={() => this.checkChoiceShow()} autoPlay></video>
             <div id="choice-time-ran-out" className="pop-up-msg hidden">No choice was made in the time limit, a random choice was selected.</div>
@@ -40,18 +45,27 @@ class Player extends Component
                     <button onClick={() => this.handleFullScreen()} id="fullscreen" className="fullscreen"/>
                 </div>
             </div>
+            </div>
         </div>
         <div style={{display: "none"}} id="end-title">
             <h2>The content has ended.</h2>
-            <button onClick={() => this.props.app_parent.setState({ mode: "browse", tree_id: null, user: this.props.app_parent.state.user })}>Return to main menu</button>
+            <button onClick={() => this.props.app_parent.setState({ mode: "browse", vid_id: null, tree_id: null, user: this.props.app_parent.state.user })}>Return to main menu</button>
         </div>
        </div>
     )
     };
 
+    async getLikes()
+    {
+        console.log(this.props.vid_id);
+        let resp = await fetch("https://interact-server.herokuapp.com/get-video/" + this.props.vid_id)
+        .then(r => r.json());
+        document.getElementById("like-indicator").innerHTML = resp.likes;
+    }
+
     handleFullScreen()
     {
-        if (screenfull.isEnabled) screenfull.request(document.getElementById("video-comp"));
+        if (screenfull.isEnabled) screenfull.request(document.getElementById("video-container"));
         else screenfull.exit()
     }
 
@@ -87,6 +101,7 @@ class Player extends Component
         if(this.findVideoPathObject(vidid).event) this.setState({tree : this.state.tree, current_video: vidid, final: false, choices: new_choices, time_when_choice: null})
         else this.setState({tree : this.state.tree, current_video: vidid, final: true, choices: new_choices, time_when_choice: null})
         this.handleEvent(vidid)
+        this.toggleController();
     }
 
     getChoiceShowDuration()
@@ -152,6 +167,7 @@ class Player extends Component
     {
         document.getElementById("choices").className = "shown";
         this.setTimer(time)
+        this.toggleController();
     }
 
     //Optimize
@@ -247,6 +263,12 @@ class Player extends Component
            this.choiceDurationEnded()
         }
 
+    }
+
+    toggleController()
+    {
+        document.getElementById("play-pause").disabled = !document.getElementById("play-pause").disabled;
+        document.getElementById("rewind").disabled = !document.getElementById("rewind").disabled;
     }
 }
 

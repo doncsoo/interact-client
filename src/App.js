@@ -14,7 +14,7 @@ import userimg from './user.svg';
 class App extends Component
 {
 
-  state = {mode: "browse", tree_id: null, user: null}
+  state = {mode: "browse", vid_id: null, tree_id: null, user: null}
 
   componentDidMount()
   {
@@ -53,7 +53,7 @@ class App extends Component
     }
     else if(this.state.mode == "video_play")
     {
-      return (<div><Player app_parent={this} tree_id={this.state.tree_id}/></div>)
+      return (<div><Player app_parent={this} vid_id={this.state.vid_id} tree_id={this.state.tree_id}/></div>)
     }
   }
 
@@ -71,21 +71,21 @@ class App extends Component
 
 async queryVideos()
 {
-  var resp = await fetch("https://interact-server.herokuapp.com/get-videos")
+  var resp = await fetch("https://interact-server.herokuapp.com/get-videos/all")
         .then(r => r.json());
   var entries = []
   for(var i = 0 ; i < resp.length; i++)
   {
     //entries.push(<div><h3>{resp[i].name}</h3><h5>{resp[i].upload_date}</h5><button id={resp[i].tree_id} onClick={e => this.initPlayer(e.target.id)}>Link a videóhoz</button><label>{resp[i].description}</label></div>)
-    entries.push(<VideoButton tree_id={resp[i].tree_id} initPlayer={(tree) => this.initPlayer(tree)} title={resp[i].name} creator={resp[i].owner} upload_date={resp[i].upload_date} description={resp[i].description} preview_id={resp[i].preview_id}/>)
+    entries.push(<VideoButton tree_id={resp[i].tree_id} vid_id={resp[i].id} likes={resp[i].likes} initPlayer={(tree,id) => this.initPlayer(tree,id)} title={resp[i].name} creator={resp[i].owner} upload_date={resp[i].upload_date} description={resp[i].description} preview_id={resp[i].preview_id}/>)
   }
   ReactDOM.render(entries,document.getElementById("all-videos"))
 }
 
-initPlayer(treeid)
+initPlayer(treeid,id)
 {
   console.log("Launching video...")
-  this.setState({ mode: "video_play", tree_id: treeid, user: this.state.user });
+  this.setState({ mode: "video_play", vid_id: id, tree_id: treeid, user: this.state.user });
 }
 
 openLogInModal()
@@ -95,7 +95,7 @@ openLogInModal()
 
 setUser(set_user)
 {
-  this.setState({ mode: this.state.mode, tree_id: this.state.tree_id, user: set_user });
+  this.setState({ mode: this.state.mode, vid_id: this.state.vid_id, tree_id: this.state.tree_id, user: set_user });
 }
 
 deRenderLogInModal()
