@@ -40,6 +40,12 @@ class App extends Component
          <h2 className="logo">INTERACT</h2>
          {this.getUserComp()}
          </div>
+         <div id="usermenu" className="usermenucontainer">
+          <h3 style={{display: "block", color: "black"}}>Hello {this.state.user ? this.state.user : "User"}</h3>
+          <h4 style={{display: "block"}}>Create a new content</h4>
+          <h4 style={{display: "block"}}>Your Uploads</h4>
+          <h4 style={{display: "block"}}>Favorites</h4>
+         </div>
          <div className="content-body">
          <input className="search-bar" type="text" size="30" placeholder="Search for some content..."/>
           <br></br>
@@ -61,12 +67,18 @@ class App extends Component
   {
     if(!this.state.user)
     {
-      return (<h3 onClick={() => this.openLogInModal()} className="log-in"><a>Log In</a></h3>);
+      return (<h3 style={{cursor: "pointer"}} onClick={() => this.openLogInModal()} className="log-in"><a>Log In</a></h3>);
     }
     else
     {
-      return (<img title={"Logged in as " + this.state.user} src={userimg} className="log-in"/>);
+      return (<img style={{cursor: "pointer"}} onClick={() => this.showUserMenu()} title={"Logged in as " + this.state.user} src={userimg} className="log-in"/>);
     }
+  }
+
+  showUserMenu()
+  {
+    if(document.getElementById("usermenu").style.display == "none") document.getElementById("usermenu").style.display = "block"
+    else document.getElementById("usermenu").style.display = "none"
   }
 
 async queryVideos()

@@ -44,19 +44,8 @@
             "id": "9G2TZ",
             "event":
             {
-                "type": "choice",
-                "duration": 10,
-                "choices":
-                {
-                    "one": "Menj Krisztiánhoz",
-                    "two": "Menj Krisztiánhoz"
-                },
-                "gateway":
-                {
-                    "one": "KR137",
-                    "two": "KR137"
-                }
-    
+                "type": "linear",
+                "gateway": "KR137"
             }
         },
         {

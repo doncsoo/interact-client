@@ -34,11 +34,11 @@ class Player extends Component
             <div id="choice-time-ran-out" className="pop-up-msg hidden">No choice was made in the time limit, a random choice was selected.</div>
             <div className="hidden" id="choices">
             <div id="inner-choices"></div>
-            <div class="timer-bar">
-            <div id="timer-fill" class="timer-fill"/>
-            </div>
             </div>
             <div class="controls">
+            <div id="timer-bar" className="timer-bar hidden">
+            <div id="timer-fill" class="timer-fill"/>
+            </div>
                 <div class="buttons">
                     <button onClick={() => this.handlePlayButton()} id="play-pause" className="pause"/>
                     <button onClick={() => document.getElementById("video-src").currentTime = document.getElementById("video-src").currentTime - 10} id="rewind" className="rewind"/>
@@ -65,8 +65,17 @@ class Player extends Component
 
     handleFullScreen()
     {
-        if (screenfull.isEnabled) screenfull.request(document.getElementById("video-container"));
-        else screenfull.exit()
+        if (screenfull.isEnabled)
+        {
+            if(!screenfull.isFullscreen)
+            {
+                screenfull.request(document.getElementById("video-container"));
+            }
+            else
+            {
+                screenfull.exit(); 
+            }
+        }
     }
 
     //Optimize required
@@ -97,11 +106,12 @@ class Player extends Component
         let new_choices = this.state.choices
         if(choice) new_choices.push(choice)
         document.getElementById("choices").className = "hidden";
+        document.getElementById("timer-bar").className = "timer-bar hidden";
         ReactDOM.unmountComponentAtNode(document.getElementById("inner-choices"))
         if(this.findVideoPathObject(vidid).event) this.setState({tree : this.state.tree, current_video: vidid, final: false, choices: new_choices, time_when_choice: null})
         else this.setState({tree : this.state.tree, current_video: vidid, final: true, choices: new_choices, time_when_choice: null})
         this.handleEvent(vidid)
-        this.toggleController();
+        this.toggleController(true);
     }
 
     getChoiceShowDuration()
@@ -166,12 +176,13 @@ class Player extends Component
     showChoices(time)
     {
         document.getElementById("choices").className = "shown";
+        document.getElementById("timer-bar").className = "timer-bar shown";
         this.setTimer(time)
-        this.toggleController();
+        this.toggleController(false);
     }
 
     //Optimize
-    choiceDurationEnded()
+    videoDurationEnded()
     {
         let vidobj = null;
         if(this.state.current_video == "start") vidobj = this.state.tree.start_video;
@@ -181,6 +192,7 @@ class Player extends Component
         {
             if(vidobj.event.type == "choice") this.randomizeSelection(vidobj)
             if(vidobj.event.type == "butterfly") this.getButterflyResult(vidobj)
+            if(vidobj.event.type == "linear") this.changeCurrentVideo(vidobj.event.gateway,null)
         }
     }
 
@@ -260,15 +272,15 @@ class Player extends Component
            document.getElementById("end-title").style.display = "inline";
         }
         else {
-           this.choiceDurationEnded()
+           this.videoDurationEnded()
         }
 
     }
 
-    toggleController()
+    toggleController(value)
     {
-        document.getElementById("play-pause").disabled = !document.getElementById("play-pause").disabled;
-        document.getElementById("rewind").disabled = !document.getElementById("rewind").disabled;
+        document.getElementById("play-pause").disabled = !value;
+        document.getElementById("rewind").disabled = !value;
     }
 }
 

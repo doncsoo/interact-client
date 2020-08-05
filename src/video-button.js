@@ -11,12 +11,14 @@ class VideoButton extends Component
   render()
   {
       return (
-          <div onClick={() => this.props.initPlayer(this.props.tree_id,this.props.vid_id)} id="video-button">
+          <div style={{cursor: "pointer"}} onClick={() => this.props.initPlayer(this.props.tree_id,this.props.vid_id)} id="video-button">
           <img id="preview" width="200px" height="120px"></img>
+          <div>
           <label style={{paddingBottom: "5px", paddingLeft: "5px"}}><b>{this.props.title}</b></label>
-          <label style={{display: "none"}}>By: {this.props.creator}</label>
-          <label style={{display: "none"}}>By: {this.props.upload_date}</label>
-          <label style={{display: "none"}}>{this.props.description}</label>
+          <label style={{paddingBottom: "5px", paddingLeft: "5px"}}>By: {this.props.creator}</label>
+          <label style={{paddingBottom: "5px", paddingLeft: "5px"}}>Uploaded: {this.props.upload_date.substring(0,10)}</label>
+          <label style={{paddingBottom: "5px", paddingLeft: "5px"}}>{this.props.description}</label>
+          </div>
           </div>
       )
   }

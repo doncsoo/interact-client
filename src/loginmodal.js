@@ -12,8 +12,8 @@ class LogInModal extends Component
         <div>
         <div id="id01" className="modal">
         <span onClick={() => this.props.app_parent.deRenderLogInModal()} className="close" title="Close Modal">Close</span>
-         <div id="notifications"></div>
         <div className="modal-content animate">
+        <div id="notifications"></div>
           {this.getMainContent()}
 
           <div className="logincontainer" style={{backgroundColor:"#f1f1f1"}}>
@@ -35,13 +35,12 @@ class LogInModal extends Component
 
       <label for="psw"><b>Password</b></label>
       <input type="password" placeholder="Enter Password" name="psw" id="psw" required/>
-
+      <br></br>
       <button onClick={() => this.attemptLogIn()} type="submit">Login</button>
       <label>
         <input type="checkbox" checked="checked" name="remember"/> Remember me
       </label>
-      <button onClick={() => this.setState({mode: "register"})} className="button" class="cancelbtn">Exit</button>
-      <span className="psw">Forgot <a href="#">password?</a></span>
+      <button onClick={() => this.setState({mode: "register"})} className="button" class="cancelbtn">Register</button>
     </div>);
     }
     else if(this.state.mode == "register")
@@ -81,6 +80,11 @@ class LogInModal extends Component
         this.props.app_parent.setUser(document.getElementById("uname").value);
         this.props.app_parent.deRenderLogInModal();
     }
+    else
+    {
+      let notification = (<div className="notification error"><p>{resp}</p></div>);
+      ReactDOM.render(notification,document.getElementById("notifications"))
+    }
   }
 
   async attemptRegister()
@@ -95,9 +99,15 @@ class LogInModal extends Component
                    fullname: document.getElementById("fname").value})
         })
         .then(r => r.text());
-    document.getElementById("notifications").innerHTML = "<h4>"+ resp +"</h4>"
     if(resp.includes("Registration successful")){
+      let notification = (<div className="notification info"><p>You can now log in with registered credentials!</p></div>);
+      ReactDOM.render(notification,document.getElementById("notifications"))
       this.setState({mode: "login"});
+    }
+    else
+    {
+      let notification = (<div className="notification error"><p>{resp}</p></div>);
+      ReactDOM.render(notification,document.getElementById("notifications"))
     }
   }
 }
