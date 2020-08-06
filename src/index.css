@@ -139,12 +139,23 @@ div#choices
   padding: 10px;
 }
 
+.subtitle {
+  display: inline;
+  position: absolute;
+  top: 10%;
+  opacity: 0.65;
+}
+
 .buttons button {
   background: none;
   border: none;
   outline: 0;
   cursor: pointer;
+  opacity: 0.65;
+}
 
+.buttons button:hover {
+  opacity: 1;
 }
 
 .buttons button.play:before {
@@ -157,6 +168,22 @@ div#choices
 
 .buttons button.rewind:before {
   content: url(rewind.svg);
+}
+
+button.like {
+  background: none;
+  border: none;
+  outline: 0;
+  cursor: pointer;
+  opacity: 0.65;
+}
+
+button.like:before {
+  content: url(like.svg);
+}
+
+button.like:hover {
+  opacity: 1;
 }
 
 .buttons button.fullscreen:before {

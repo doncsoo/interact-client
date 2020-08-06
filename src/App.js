@@ -7,28 +7,18 @@ import {
 } from 'react-router-dom'
 import './App.css';
 import Player from './player';
-import VideoButton from './video-button';
 import LogInModal from './loginmodal';
 import userimg from './user.svg';
+import BrowserContent from './browsecontent';
 
 class App extends Component
 {
 
-  state = {mode: "browse", vid_id: null, tree_id: null, user: null}
-
-  componentDidMount()
-  {
-    if(this.state.mode == "browse") this.queryVideos();
-  }
-
-  componentDidUpdate()
-  {
-    if(this.state.mode == "browse") this.queryVideos();
-  }
+  state = {mode: "browse_main", vid_id: null, tree_id: null, user: null}
 
   render()
   {
-    if (this.state.mode == "browse") {
+    if (this.state.mode.includes("browse")) {
       return (<Router>
         <div className="App">
          <Switch>
@@ -37,20 +27,16 @@ class App extends Component
           </Route>
           <Route path="">
          <div className="black-header">
-         <h2 className="logo">INTERACT</h2>
+         <h2 onClick={() => this.setState({ mode: "browse_main", vid_id: null, tree_id: null, user: this.state.user })} style={{cursor: "pointer"}} className="logo">INTERACT</h2>
          {this.getUserComp()}
          </div>
          <div id="usermenu" className="usermenucontainer">
           <h3 style={{display: "block", color: "black"}}>Hello {this.state.user ? this.state.user : "User"}</h3>
-          <h4 style={{display: "block"}}>Create a new content</h4>
-          <h4 style={{display: "block"}}>Your Uploads</h4>
-          <h4 style={{display: "block"}}>Favorites</h4>
+          <h4 onClick={() => alert("This function is not available yet!")} style={{cursor: "pointer", display: "block"}}>Create a new content</h4>
+          <h4 onClick={() => this.setState({ mode: "browse_uploads", vid_id: null, tree_id: null, user: this.state.user })} style={{cursor: "pointer", display: "block"}}>Your Uploads</h4>
+          <h4 onClick={() => alert("This function is not available yet!")} style={{cursor: "pointer", display: "block"}}>Favorites</h4>
          </div>
-         <div className="content-body">
-         <input className="search-bar" type="text" size="30" placeholder="Search for some content..."/>
-          <br></br>
-          <div id="all-videos"/>
-         </div>
+         <BrowserContent app_parent={this} mode={this.state.mode.replace("browse_","")}/>
          <div id="login-modal-div"/>
           </Route>
           </Switch>
@@ -80,19 +66,6 @@ class App extends Component
     if(document.getElementById("usermenu").style.display == "none") document.getElementById("usermenu").style.display = "block"
     else document.getElementById("usermenu").style.display = "none"
   }
-
-async queryVideos()
-{
-  var resp = await fetch("https://interact-server.herokuapp.com/get-videos/all")
-        .then(r => r.json());
-  var entries = []
-  for(var i = 0 ; i < resp.length; i++)
-  {
-    //entries.push(<div><h3>{resp[i].name}</h3><h5>{resp[i].upload_date}</h5><button id={resp[i].tree_id} onClick={e => this.initPlayer(e.target.id)}>Link a videóhoz</button><label>{resp[i].description}</label></div>)
-    entries.push(<VideoButton tree_id={resp[i].tree_id} vid_id={resp[i].id} likes={resp[i].likes} initPlayer={(tree,id) => this.initPlayer(tree,id)} title={resp[i].name} creator={resp[i].owner} upload_date={resp[i].upload_date} description={resp[i].description} preview_id={resp[i].preview_id}/>)
-  }
-  ReactDOM.render(entries,document.getElementById("all-videos"))
-}
 
 initPlayer(treeid,id)
 {

@@ -2,7 +2,7 @@
     "video_title": "Bebaszas",
     "start_video": 
     {
-        "title": "",
+        "title": "Utcákon császkálódás",
         "id": "COWC6",
         "event": 
         {
@@ -24,7 +24,7 @@
     "videos":
     [
         {
-            "title": "",
+            "title": "Békafüttyben ivás",
             "id": "AB5G6",
             "event":
             {
@@ -40,7 +40,7 @@
             }
         },
         {
-            "title": "",
+            "title": "Vissza a szállásra",
             "id": "9G2TZ",
             "event":
             {
@@ -49,7 +49,7 @@
             }
         },
         {
-            "title": "",
+            "title": "Krisztán bejelenteni valója",
             "id": "KR137",
             "event": null
         }

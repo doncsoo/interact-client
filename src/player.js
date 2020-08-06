@@ -23,9 +23,9 @@ class Player extends Component
         return (<div className="container" id="video1">
         <div id="video-comp" className="c-video">
         <div id="header">
-        <button onClick={() => this.props.app_parent.setState({ mode: "browse", vid_id: null, tree_id: null, user: this.props.app_parent.state.user })}>Exit</button>
+        <button onClick={() => this.props.app_parent.setState({ mode: "browse_main", vid_id: null, tree_id: null, user: this.props.app_parent.state.user })}>Exit</button>
         <h2 style={{marginBottom: "1px"}}>{!this.state.tree ? null : this.state.tree.video_title}</h2>
-        <img style={{display: "inline", paddingRight: "10px"}} src={like}/>
+        <button style={{display: "inline", paddingRight: "10px"}} className="like"/>
         <h3 id="like-indicator" style={{display: "inline"}}>-</h3>
         </div>
         <div id="video-container">
@@ -43,13 +43,14 @@ class Player extends Component
                     <button onClick={() => this.handlePlayButton()} id="play-pause" className="pause"/>
                     <button onClick={() => document.getElementById("video-src").currentTime = document.getElementById("video-src").currentTime - 10} id="rewind" className="rewind"/>
                     <button onClick={() => this.handleFullScreen()} id="fullscreen" className="fullscreen"/>
+                    <h3 className="subtitle">{this.state.tree ? this.getCurrentTitle() : null}</h3>
                 </div>
             </div>
             </div>
         </div>
         <div style={{display: "none"}} id="end-title">
             <h2>The content has ended.</h2>
-            <button onClick={() => this.props.app_parent.setState({ mode: "browse", vid_id: null, tree_id: null, user: this.props.app_parent.state.user })}>Return to main menu</button>
+            <button onClick={() => this.props.app_parent.setState({ mode: "browse_main", vid_id: null, tree_id: null, user: this.props.app_parent.state.user })}>Return to main menu</button>
         </div>
        </div>
     )
@@ -128,6 +129,12 @@ class Player extends Component
                 time_when_choice:(vidduration - vidobj.event.duration)})
             console.log("Setting choice duration")
         }
+    }
+
+    getCurrentTitle()
+    {
+        if(this.state.current_video == "start") return this.state.tree.start_video.title
+        else return this.findVideoPathObject(this.state.current_video).title
     }
 
     checkChoiceShow()
