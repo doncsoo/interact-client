@@ -59,6 +59,7 @@ div#choices
 .decision {
   position: absolute;
   display: flex;
+  text-align: justify;
   width: 300px;
   background-color: rgba(0,0,0,0.7);
   padding: 10px;
@@ -71,13 +72,23 @@ div#choices
   font-size: 200%;
 }
 
+#video-container:fullscreen #inner-choices .decision1{
+  right: 70%;
+  top: 70%;
+}
+
+#video-container:fullscreen #inner-choices .decision2{
+  right: 15%;
+  top: 70%;
+}
+
 .decision1{
-  right: 60%;
+  right: 65%;
   top: 70%;
 }
 
 .decision2 {
-  right: 15%;
+  right: 7%;
   top: 70%;
 }
 
@@ -102,7 +113,8 @@ div#choices
   width: 250px;
   background-color: rgba(0,0,0,0.7);
   padding: 10px;
-  right: 75%;
+  left: 50%;
+  transform: translateX(-50%);
   top: 5%;
   height: 8vh;
   color: white;
@@ -133,6 +145,11 @@ div#choices
 
 .video {
   width: 100%;
+  max-height: 85vh;
+}
+
+#video-container:fullscreen .video {
+  max-height: 100vh;
 }
 
 .buttons {

@@ -34,7 +34,7 @@ class App extends Component
           <h3 style={{display: "block", color: "black"}}>Hello {this.state.user ? this.state.user : "User"}</h3>
           <h4 onClick={() => alert("This function is not available yet!")} style={{cursor: "pointer", display: "block"}}>Create a new content</h4>
           <h4 onClick={() => this.setState({ mode: "browse_uploads", vid_id: null, tree_id: null, user: this.state.user })} style={{cursor: "pointer", display: "block"}}>Your Uploads</h4>
-          <h4 onClick={() => alert("This function is not available yet!")} style={{cursor: "pointer", display: "block"}}>Favorites</h4>
+          <h4 onClick={() => this.setState({ mode: "browse_favorites", vid_id: null, tree_id: null, user: this.state.user })} style={{cursor: "pointer", display: "block"}}>Favorites</h4>
          </div>
          <BrowserContent app_parent={this} mode={this.state.mode.replace("browse_","")}/>
          <div id="login-modal-div"/>

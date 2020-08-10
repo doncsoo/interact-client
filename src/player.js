@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom';
 import screenfull from 'screenfull';
 import './App.css';
 import loadinggif from './loading.gif';
-import like from './like.svg';
 
 class Player extends Component
 {
@@ -12,8 +11,6 @@ class Player extends Component
     async componentDidMount()
     {
         var jsontree = await fetch("https://interact-videos.s3.eu-central-1.amazonaws.com/selection_trees/" + this.props.tree_id + ".json").then(r => r.json());
-        //temporary solution: fixing portait videos overflowing viewport
-        document.getElementById("video-src").style.maxHeight = String(window.innerHeight * 0.85) + "px"
         this.getLikes();
         this.setState({tree : jsontree, current_video: "start", final: false, choices: [], time_when_choice: null})
         this.handleEvent("start")
@@ -30,7 +27,7 @@ class Player extends Component
         </div>
         <div id="video-container">
             <img width="140" height="142" id="buffering" className="buffering hidden" src={loadinggif}/>
-            <video id="video-src" src={this.fetchVideo()} onLoadStart={() => document.getElementById("buffering").className = "buffering"} onCanPlay={() => document.getElementById("buffering").className = "buffering hidden"} onWaiting={() => document.getElementById("buffering").className = "buffering"} onPlaying={() => this.getChoiceShowDuration()}  className="video" onEnded={() => this.endFunction()} onTimeUpdate={() => this.checkChoiceShow()} autoPlay></video>
+            <video id="video-src" src={this.fetchVideo()} onLoadStart={() => document.getElementById("buffering").className = "buffering"} onCanPlay={() => document.getElementById("buffering").className = "buffering hidden"} onWaiting={() => document.getElementById("buffering").className = "buffering"} onPlaying={() => this.getChoiceShowDuration()}  className="video" onEnded={() => this.endFunction()} onTimeUpdate={() => this.checkChoiceShow()} onError={() => this.globalError()} autoPlay></video>
             <div id="choice-time-ran-out" className="pop-up-msg hidden">No choice was made in the time limit, a random choice was selected.</div>
             <div className="hidden" id="choices">
             <div id="inner-choices"></div>
@@ -52,13 +49,17 @@ class Player extends Component
             <h2>The content has ended.</h2>
             <button onClick={() => this.props.app_parent.setState({ mode: "browse_main", vid_id: null, tree_id: null, user: this.props.app_parent.state.user })}>Return to main menu</button>
         </div>
+        <div style={{display: "none"}} id="error-screen">
+            <h2>An error occurred.</h2>
+            <h3>Please try again later.</h3>
+            <button onClick={() => this.props.app_parent.setState({ mode: "browse_main", vid_id: null, tree_id: null, user: this.props.app_parent.state.user })}>Return to main menu</button>
+        </div>
        </div>
     )
     };
 
     async getLikes()
     {
-        console.log(this.props.vid_id);
         let resp = await fetch("https://interact-server.herokuapp.com/get-video/" + this.props.vid_id)
         .then(r => r.json());
         document.getElementById("like-indicator").innerHTML = resp.likes;
@@ -127,7 +128,6 @@ class Player extends Component
                 current_video: this.state.current_video, 
                 final: this.state.final, choices: this.state.choices, 
                 time_when_choice:(vidduration - vidobj.event.duration)})
-            console.log("Setting choice duration")
         }
     }
 
@@ -141,8 +141,6 @@ class Player extends Component
     {
         if(this.state.time_when_choice)
         {
-            console.log(document.getElementById("video-src").currentTime)
-            console.log(this.state.time_when_choice)
             if(document.getElementById("video-src").currentTime >= this.state.time_when_choice)
             {
                 let vidobj = null;
@@ -207,9 +205,6 @@ class Player extends Component
     {
         for(let j = 0; j < vidobj.event.required_choices.length; j++)
         {
-            console.log(this.state.choices)
-            console.log(vidobj.event.required_choices[j])
-            console.log(this.state.choices.includes(vidobj.event.required_choices[j]))
             if(this.state.choices.includes(vidobj.event.required_choices[j]))
             {
                 this.changeCurrentVideo(vidobj.event.gateway[j],null)
@@ -238,13 +233,19 @@ class Player extends Component
         let amount = time * 1000;
         let interval = setInterval(() => 
         {
-            amount -= 15;
-            if(amount < 0)
+            try
             {
-                console.log("choice duration ended");
+                amount -= 15;
+                if(amount < 0)
+                {
+                    clearInterval(interval);
+                }
+                else document.getElementById("timer-fill").style.width = (amount/fullamount * 100) + "%"
+            }
+            catch (error)
+            {
                 clearInterval(interval);
             }
-            else document.getElementById("timer-fill").style.width = (amount/fullamount * 100) + "%"
         },15)
     }
 
@@ -276,7 +277,7 @@ class Player extends Component
         if(this.state.final == true)
         {
            document.getElementById("video-comp").style.display = "none";
-           document.getElementById("end-title").style.display = "inline";
+           document.getElementById("end-title").style.display = "block";
         }
         else {
            this.videoDurationEnded()
@@ -288,6 +289,12 @@ class Player extends Component
     {
         document.getElementById("play-pause").disabled = !value;
         document.getElementById("rewind").disabled = !value;
+    }
+
+    globalError()
+    {
+        document.getElementById("video-comp").style.display = "none";
+        document.getElementById("error-screen").style.display = "block";
     }
 }
 
