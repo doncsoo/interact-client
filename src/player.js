@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import screenfull from 'screenfull';
 import './App.css';
 import loadinggif from './loading.gif';
+import Cookie from 'cookie';
 
 class Player extends Component
 {
@@ -22,7 +23,7 @@ class Player extends Component
         <div id="header">
         <button onClick={() => this.props.app_parent.setState({ mode: "browse_main", vid_id: null, tree_id: null, user: this.props.app_parent.state.user })}>Exit</button>
         <h2 style={{marginBottom: "1px"}}>{!this.state.tree ? null : this.state.tree.video_title}</h2>
-        <button style={{display: "inline", paddingRight: "10px"}} className="like"/>
+        <button id="like-button" onClick={() => this.processLike()} style={{display: "inline", paddingRight: "10px"}} className="like"/>
         <h3 id="like-indicator" style={{display: "inline"}}>-</h3>
         </div>
         <div id="video-container">
@@ -63,6 +64,41 @@ class Player extends Component
         let resp = await fetch("https://interact-server.herokuapp.com/get-video/" + this.props.vid_id)
         .then(r => r.json());
         document.getElementById("like-indicator").innerHTML = resp.likes;
+
+        let resp2 = await fetch("http://interact-server.herokuapp.com/get-fav-videos/" + this.props.app_parent.state.user)
+        .then(r => r.json());
+        for(let x = 0; x < resp2.likes.length; x++)
+        {
+            if(resp2.likes[x] == this.props.vid_id)
+            {
+                console.log("liked")
+                document.getElementById("like-button").className = "like liked";
+            }
+        }
+    }
+
+    async processLike()
+    {
+        //getting token cookie
+        let cookies = Cookie.parse(document.cookie);
+        if(cookies.session_token)
+        {
+            let resp = await fetch("https://interact-server.herokuapp.com/interaction-addlike",{
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({token: cookies.session_token,
+                   video_id: this.props.vid_id}),
+            })
+            .then(r => r.text());
+
+            if(resp == "OK")
+            {
+                document.getElementById("like-button").className = "like liked";
+                document.getElementById("like-indicator").innerHTML = Number(document.getElementById("like-indicator").innerHTML) + 1;
+            } 
+        }
     }
 
     handleFullScreen()

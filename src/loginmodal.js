@@ -6,6 +6,11 @@ class LogInModal extends Component
 {
   state = {mode: "login"}
 
+  componentDidUpdate()
+  {
+    ReactDOM.unmountComponentAtNode(document.getElementById("notifications"))
+  }
+
   render()
   {
       return (
@@ -67,7 +72,7 @@ class LogInModal extends Component
 
   async attemptLogIn()
   {
-    var resp = await fetch("https://interact-server.herokuapp.com/user-verify",{
+    let resp = await fetch("https://interact-server.herokuapp.com/user-verify",{
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
@@ -75,21 +80,23 @@ class LogInModal extends Component
             body: JSON.stringify({username: document.getElementById("uname").value,
                    password: document.getElementById("psw").value}),
         })
-        .then(r => r.text());
-    if(resp.includes("User verified!")){
+        .then(r => r.json());
+    if(resp.verified == true){
         this.props.app_parent.setUser(document.getElementById("uname").value);
+        document.cookie = "session_user=" + document.getElementById("uname").value;
+        document.cookie = "session_token=" + resp.token;    
         this.props.app_parent.deRenderLogInModal();
     }
     else
     {
-      let notification = (<div className="notification error"><p>{resp}</p></div>);
+      let notification = (<div className="notification error"><p>{resp.error}</p></div>);
       ReactDOM.render(notification,document.getElementById("notifications"))
     }
   }
 
   async attemptRegister()
   {
-    var resp = await fetch("https://interact-server.herokuapp.com/register",{
+    let resp = await fetch("https://interact-server.herokuapp.com/register",{
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'

@@ -10,11 +10,19 @@ import Player from './player';
 import LogInModal from './loginmodal';
 import userimg from './user.svg';
 import BrowserContent from './browsecontent';
+import Cookie from 'cookie';
 
 class App extends Component
 {
 
   state = {mode: "browse_main", vid_id: null, tree_id: null, user: null}
+
+  componentDidMount()
+  {
+    //try to pre authenticate
+    let cookies = Cookie.parse(document.cookie)
+    if(cookies.session_user) this.setState({ mode: this.state.mode, vid_id: this.state.vid_id, tree_id: this.state.tree_id, user: cookies.session_user})
+  }
 
   render()
   {
@@ -35,6 +43,7 @@ class App extends Component
           <h4 onClick={() => alert("This function is not available yet!")} style={{cursor: "pointer", display: "block"}}>Create a new content</h4>
           <h4 onClick={() => this.setState({ mode: "browse_uploads", vid_id: null, tree_id: null, user: this.state.user })} style={{cursor: "pointer", display: "block"}}>Your Uploads</h4>
           <h4 onClick={() => this.setState({ mode: "browse_favorites", vid_id: null, tree_id: null, user: this.state.user })} style={{cursor: "pointer", display: "block"}}>Favorites</h4>
+          <h4 onClick={() => this.logOutFunction()} style={{cursor: "pointer", display: "block", color: "red"}}>Log out</h4>
          </div>
          <BrowserContent app_parent={this} mode={this.state.mode.replace("browse_","")}/>
          <div id="login-modal-div"/>
@@ -57,11 +66,11 @@ class App extends Component
     }
     else
     {
-      return (<img style={{cursor: "pointer"}} onClick={() => this.showUserMenu()} title={"Logged in as " + this.state.user} src={userimg} className="log-in"/>);
+      return (<img style={{cursor: "pointer"}} onClick={() => this.toggleUserMenu()} title={"Logged in as " + this.state.user} src={userimg} className="log-in"/>);
     }
   }
 
-  showUserMenu()
+  toggleUserMenu()
   {
     if(document.getElementById("usermenu").style.display == "none") document.getElementById("usermenu").style.display = "block"
     else document.getElementById("usermenu").style.display = "none"
@@ -86,6 +95,14 @@ setUser(set_user)
 deRenderLogInModal()
 {
   ReactDOM.unmountComponentAtNode(document.getElementById("login-modal-div"))
+}
+
+logOutFunction()
+{
+  document.cookie = "session_user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+  document.cookie = "session_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+  this.setState({ mode: "browse_main", vid_id: this.state.vid_id, tree_id: this.state.tree_id, user: null})
+  this.toggleUserMenu()
 }
 }
 

@@ -203,6 +203,10 @@ button.like:hover {
   opacity: 1;
 }
 
+button.liked {
+  opacity: 1;
+}
+
 .buttons button.fullscreen:before {
   content: url(full-screen.png);
   position: absolute;
