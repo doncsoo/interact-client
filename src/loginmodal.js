@@ -42,9 +42,7 @@ class LogInModal extends Component
       <input type="password" placeholder="Enter Password" name="psw" id="psw" required/>
       <br></br>
       <button onClick={() => this.attemptLogIn()} type="submit">Login</button>
-      <label>
-        <input type="checkbox" checked="checked" name="remember"/> Remember me
-      </label>
+      <br/>
       <button onClick={() => this.setState({mode: "register"})} className="button" class="cancelbtn">Register</button>
     </div>);
     }
@@ -58,7 +56,7 @@ class LogInModal extends Component
       <input type="password" placeholder="Enter Password" name="rpsw" id="rpsw" required/>
 
       <label for="fname"><b>Full Name</b></label>
-      <input type="text" placeholder="Enter Password" name="fname" id="fname" required/>
+      <input type="text" placeholder="Enter Fullname" name="fname" id="fname" required/>
 
       <button onClick={() => this.attemptRegister()} type="submit">Register</button>
     </div>);

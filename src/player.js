@@ -7,13 +7,14 @@ import Cookie from 'cookie';
 
 class Player extends Component
 {
-    state = {tree : null, current_video: null, final: false, choices: [], time_when_choice: null}
+    state = {tree : null, current_video: null, final: false, choices: [], time_when_choice: null, liked: null}
 
     async componentDidMount()
     {
         var jsontree = await fetch("https://interact-videos.s3.eu-central-1.amazonaws.com/selection_trees/" + this.props.tree_id + ".json").then(r => r.json());
         this.getLikes();
-        this.setState({tree : jsontree, current_video: "start", final: false, choices: [], time_when_choice: null})
+        this.setState({tree : jsontree, current_video: "start", 
+        final: false, choices: [], time_when_choice: null, liked: null})
         this.handleEvent("start")
     }
 
@@ -23,7 +24,7 @@ class Player extends Component
         <div id="header">
         <button onClick={() => this.props.app_parent.setState({ mode: "browse_main", vid_id: null, tree_id: null, user: this.props.app_parent.state.user })}>Exit</button>
         <h2 style={{marginBottom: "1px"}}>{!this.state.tree ? null : this.state.tree.video_title}</h2>
-        <button id="like-button" onClick={() => this.processLike()} style={{display: "inline", paddingRight: "10px"}} className="like"/>
+        <button id="like-button" title={!this.props.app_parent.user ? "Log in to use this functionality" : ""} onClick={() => this.processLike()} style={{display: "inline", paddingRight: "10px"}} className="like"/>
         <h3 id="like-indicator" style={{display: "inline"}}>-</h3>
         </div>
         <div id="video-container">
@@ -65,15 +66,26 @@ class Player extends Component
         .then(r => r.json());
         document.getElementById("like-indicator").innerHTML = resp.likes;
 
-        let resp2 = await fetch("http://interact-server.herokuapp.com/get-fav-videos/" + this.props.app_parent.state.user)
-        .then(r => r.json());
-        for(let x = 0; x < resp2.likes.length; x++)
+        if(this.props.app_parent.state.user)
         {
-            if(resp2.likes[x] == this.props.vid_id)
+            let resp2 = await fetch("http://interact-server.herokuapp.com/get-fav-videos/" + this.props.app_parent.state.user)
+                                .then(r => r.json());
+            for(let x = 0; x < resp2.likes.length; x++)
             {
-                console.log("liked")
-                document.getElementById("like-button").className = "like liked";
+                if(resp2.likes[x] == this.props.vid_id)
+                {
+                    console.log("liked")
+                    this.setState({tree : this.state.tree, current_video: this.state.current_video, 
+                    final: this.state.final, choices: this.state.choices, time_when_choice: this.state.time_when_choice, 
+                    liked: true})
+                    document.getElementById("like-button").className = "like liked";
+                    return;
+                }
             }
+            console.log("not liked")
+            this.setState({tree : this.state.tree, current_video: this.state.current_video, 
+                final: this.state.final, choices: this.state.choices, time_when_choice: this.state.time_when_choice, 
+                liked: false})
         }
     }
 
@@ -83,7 +95,10 @@ class Player extends Component
         let cookies = Cookie.parse(document.cookie);
         if(cookies.session_token)
         {
-            let resp = await fetch("https://interact-server.herokuapp.com/interaction-addlike",{
+            let action = undefined;
+            if(this.state.liked == true) action = "removelike";
+            else if(this.state.liked == false) action = "addlike";
+            let resp = await fetch("https://interact-server.herokuapp.com/interaction-" + action,{
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
@@ -95,8 +110,22 @@ class Player extends Component
 
             if(resp == "OK")
             {
-                document.getElementById("like-button").className = "like liked";
-                document.getElementById("like-indicator").innerHTML = Number(document.getElementById("like-indicator").innerHTML) + 1;
+                if(action == "addlike")
+                {
+                    document.getElementById("like-button").className = "like liked";
+                    document.getElementById("like-indicator").innerHTML = Number(document.getElementById("like-indicator").innerHTML) + 1;
+                    this.setState({tree : this.state.tree, current_video: this.state.current_video, 
+                        final: this.state.final, choices: this.state.choices, time_when_choice: this.state.time_when_choice, 
+                        liked: true})
+                }
+                else if(action == "removelike")
+                {
+                    document.getElementById("like-button").className = "like";
+                    document.getElementById("like-indicator").innerHTML = Number(document.getElementById("like-indicator").innerHTML) - 1;
+                    this.setState({tree : this.state.tree, current_video: this.state.current_video, 
+                        final: this.state.final, choices: this.state.choices, time_when_choice: this.state.time_when_choice, 
+                        liked: false})
+                }
             } 
         }
     }
@@ -146,8 +175,8 @@ class Player extends Component
         document.getElementById("choices").className = "hidden";
         document.getElementById("timer-bar").className = "timer-bar hidden";
         ReactDOM.unmountComponentAtNode(document.getElementById("inner-choices"))
-        if(this.findVideoPathObject(vidid).event) this.setState({tree : this.state.tree, current_video: vidid, final: false, choices: new_choices, time_when_choice: null})
-        else this.setState({tree : this.state.tree, current_video: vidid, final: true, choices: new_choices, time_when_choice: null})
+        if(this.findVideoPathObject(vidid).event) this.setState({tree : this.state.tree, current_video: vidid, final: false, choices: new_choices, time_when_choice: null, liked: this.state.liked})
+        else this.setState({tree : this.state.tree, current_video: vidid, final: true, choices: new_choices, time_when_choice: null, liked: this.state.liked})
         this.handleEvent(vidid)
         this.toggleController(true);
     }
@@ -163,7 +192,7 @@ class Player extends Component
             this.setState({tree : this.state.tree, 
                 current_video: this.state.current_video, 
                 final: this.state.final, choices: this.state.choices, 
-                time_when_choice:(vidduration - vidobj.event.duration)})
+                time_when_choice:(vidduration - vidobj.event.duration), liked: this.state.liked})
         }
     }
 
@@ -186,7 +215,7 @@ class Player extends Component
                 this.setState({tree : this.state.tree, 
                     current_video: this.state.current_video, 
                     final: this.state.final, choices: this.state.choices, 
-                    time_when_choice: null})
+                    time_when_choice: null, liked: this.state.liked})
             }
         }
     }
