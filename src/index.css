@@ -175,6 +175,10 @@ div#choices
   opacity: 1;
 }
 
+.buttons button:disabled:hover {
+  opacity: 0.65;
+}
+
 .buttons button.play:before {
   content: url(play-button.svg); 
 }
@@ -203,8 +207,77 @@ button.like:hover {
   opacity: 1;
 }
 
+button.close {
+  background: none;
+  border: none;
+  outline: 0;
+  cursor: pointer;
+  opacity: 0.65;
+}
+
+button.closeblack {
+  background: none;
+  border: none;
+  outline: 0;
+  cursor: pointer;
+}
+
+button.close:before {
+  content: url(close.svg);
+}
+
+button.closeblack:before {
+  content: url(closeblack.svg);
+}
+
+button.close:hover {
+  opacity: 1;
+}
+
 button.liked {
   opacity: 1;
+}
+
+.notification p {
+  color: white;
+  font-family: 'Segoe UI';
+}
+
+button.black {
+    border-radius: 7px;
+    padding: 8px;
+    display: inline-flex;
+    height: auto;
+    width: auto;
+    font-size: 15px;
+    background-color: black;
+    border: 2px solid black;
+    color: white;
+    transition: all 0.2s linear 0s;
+    margin: 5px;
+}
+
+button.black:hover {
+  background-color: white !important;
+  color: black;
+}
+
+button.white {
+  border-radius: 10px;
+  padding: 8px;
+  display: inline-flex;
+  height: auto;
+  width: auto;
+  font-size: 15px;
+  background-color: white;
+  border: 2px solid white;
+  color: black;
+  transition: all 0.2s linear 0s;
+}
+
+button.white:hover {
+background-color: black !important;
+color: white;
 }
 
 .buttons button.fullscreen:before {
@@ -316,7 +389,7 @@ button.liked {
   background-color: #fefefe;
   margin: 5px auto; /* 15% from the top and centered */
   border: 1px solid #888;
-  width: 80%; /* Could be more or less, depending on screen size */
+  width: 20%; /* Could be more or less, depending on screen size */
 }
 
 /* The Close Button */

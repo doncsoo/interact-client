@@ -53,7 +53,7 @@ class BrowseContent extends Component
 
 async queryVideos(user)
 {
-  let resp = await fetch("https://interact-server.herokuapp.com/get-videos/" + user)
+  let resp = await fetch("https://interact-server.herokuapp.com/get-videos/" + user, {cache: "no-store"})
         .then(r => r.json());
   let entries = []
   for(var i = 0 ; i < resp.length; i++)
@@ -69,7 +69,7 @@ async queryVideos(user)
 
 async queryFavorites()
 {
-  let resp = await fetch("https://interact-server.herokuapp.com/get-fav-videos/" + this.props.app_parent.state.user)
+  let resp = await fetch("https://interact-server.herokuapp.com/get-fav-videos/" + this.props.app_parent.state.user, {cache: "no-store"})
         .then(r => r.json());
   let entries = []
   for(var i = 0 ; i < resp.length; i++)

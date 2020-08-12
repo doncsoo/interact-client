@@ -16,14 +16,10 @@ class LogInModal extends Component
       return (
         <div>
         <div id="id01" className="modal">
-        <span onClick={() => this.props.app_parent.deRenderLogInModal()} className="close" title="Close Modal">Close</span>
         <div className="modal-content animate">
+        <button style={{margin: "5px", display: "inline"}} onClick={() => this.props.app_parent.deRenderLogInModal()} className="closeblack"/>
         <div id="notifications"></div>
           {this.getMainContent()}
-
-          <div className="logincontainer" style={{backgroundColor:"#f1f1f1"}}>
-            <button onClick={() => this.props.app_parent.deRenderLogInModal()} className="button" class="cancelbtn">Exit</button>
-          </div>
         </div>
       </div>
       </div>
@@ -34,21 +30,24 @@ class LogInModal extends Component
   {
     if(this.state.mode == "login")
     {
-      return (<div id="login" className="logincontainer">
+      return (<div><div id="login" className="logincontainer">
       <label for="uname"><b>Username</b></label>
       <input type="text" placeholder="Enter Username" name="uname" id="uname" required/>
 
       <label for="psw"><b>Password</b></label>
       <input type="password" placeholder="Enter Password" name="psw" id="psw" required/>
       <br></br>
-      <button onClick={() => this.attemptLogIn()} type="submit">Login</button>
+      <button onClick={() => this.attemptLogIn()} type="submit" class="black">Login</button>
       <br/>
-      <button onClick={() => this.setState({mode: "register"})} className="button" class="cancelbtn">Register</button>
+    </div>
+    <div className="logincontainer" style={{backgroundColor:"#f1f1f1"}}>
+    <button onClick={() => this.setState({mode: "register"})} className="black">Register</button>
+    </div>
     </div>);
     }
     else if(this.state.mode == "register")
     {
-      return (<div id="register" className="logincontainer">
+      return (<div><div id="register" className="logincontainer">
       <label for="rname"><b>Username</b></label>
       <input type="text" placeholder="Enter Username" name="rname" id="rname" required/>
 
@@ -57,9 +56,12 @@ class LogInModal extends Component
 
       <label for="fname"><b>Full Name</b></label>
       <input type="text" placeholder="Enter Fullname" name="fname" id="fname" required/>
-
-      <button onClick={() => this.attemptRegister()} type="submit">Register</button>
-    </div>);
+      <br/>
+      <button className="black" onClick={() => this.attemptRegister()} type="submit">Register</button>
+    </div>
+    <div className="logincontainer" style={{backgroundColor:"#f1f1f1"}}>
+    <button onClick={() => this.setState({mode: "login"})} className="black">Login</button>
+    </div></div>);
     }
   }
 
