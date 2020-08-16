@@ -39,7 +39,7 @@ class App extends Component
          {this.getUserComp()}
          </div>
          <div id="usermenu" className="usermenucontainer">
-          <h3 style={{display: "block", color: "black"}}>Hello {this.state.user ? this.state.user : "User"}</h3>
+          <h2 className="greeter"> Hello {this.state.user ? this.state.user : "User"}</h2>
           <h4 onClick={() => alert("This function is not available yet!")} style={{cursor: "pointer", display: "block"}}>Create a new content</h4>
           <h4 onClick={() => this.setState({ mode: "browse_uploads", vid_id: null, tree_id: null, user: this.state.user })} style={{cursor: "pointer", display: "block"}}>Your Uploads</h4>
           <h4 onClick={() => this.setState({ mode: "browse_favorites", vid_id: null, tree_id: null, user: this.state.user })} style={{cursor: "pointer", display: "block"}}>Favorites</h4>
@@ -72,8 +72,8 @@ class App extends Component
 
   toggleUserMenu()
   {
-    if(document.getElementById("usermenu").style.display == "none") document.getElementById("usermenu").style.display = "block"
-    else document.getElementById("usermenu").style.display = "none"
+    if(document.getElementById("usermenu").style.display == "block") document.getElementById("usermenu").style.display = "none"
+    else document.getElementById("usermenu").style.display = "block"
   }
 
 initPlayer(treeid,id)

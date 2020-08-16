@@ -33,6 +33,7 @@ class BrowseContent extends Component
         return (<div className="content-body">
         <input className="search-bar" type="text" size="30" placeholder="Search for some content..."/>
         <br/>
+        <h1>Recommended for you</h1>
         <div id="all-videos"/></div>);
       }
       else if (this.props.mode == "uploads")
