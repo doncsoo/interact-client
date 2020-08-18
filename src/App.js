@@ -11,10 +11,10 @@ import LogInModal from './loginmodal';
 import userimg from './user.svg';
 import BrowserContent from './browsecontent';
 import Cookie from 'cookie';
+import Editor from './editor';
 
 class App extends Component
 {
-
   state = {mode: "browse_main", vid_id: null, tree_id: null, user: null}
 
   componentDidMount()
@@ -26,35 +26,52 @@ class App extends Component
 
   render()
   {
-    if (this.state.mode.includes("browse")) {
-      return (<Router>
+    if (this.state.mode.includes("browse") || this.state.mode == "editor") {
+      return (
         <div className="App">
-         <Switch>
-          <Route path="/video_play">
-          <Player/>
-          </Route>
-          <Route path="">
          <div className="black-header">
          <h2 onClick={() => this.setState({ mode: "browse_main", vid_id: null, tree_id: null, user: this.state.user })} style={{cursor: "pointer"}} className="logo">INTERACT</h2>
          {this.getUserComp()}
          </div>
-         <div id="usermenu" className="usermenucontainer">
-          <h2 className="greeter"> Hello {this.state.user ? this.state.user : "User"}</h2>
-          <h4 onClick={() => alert("This function is not available yet!")} style={{cursor: "pointer", display: "block"}}>Create a new content</h4>
-          <h4 onClick={() => this.setState({ mode: "browse_uploads", vid_id: null, tree_id: null, user: this.state.user })} style={{cursor: "pointer", display: "block"}}>Your Uploads</h4>
-          <h4 onClick={() => this.setState({ mode: "browse_favorites", vid_id: null, tree_id: null, user: this.state.user })} style={{cursor: "pointer", display: "block"}}>Favorites</h4>
-          <h4 onClick={() => this.logOutFunction()} style={{cursor: "pointer", display: "block", color: "red"}}>Log out</h4>
-         </div>
-         <BrowserContent app_parent={this} mode={this.state.mode.replace("browse_","")}/>
+         {this.getUserMenu()}
+         {this.getMainContent()}
          <div id="login-modal-div"/>
-          </Route>
-          </Switch>
-          </div>
-          </Router>);
+         </div>);
     }
     else if(this.state.mode == "video_play")
     {
       return (<div><Player app_parent={this} vid_id={this.state.vid_id} tree_id={this.state.tree_id}/></div>)
+    }
+  }
+   //temp function
+  adminVerification(func)
+  {
+    if(this.state.user == "admin") this.setState({ mode: "editor", vid_id: null, tree_id: null, user: this.state.user });
+    else alert("This feature requires admin authorization.")
+  }
+
+  getUserMenu()
+  {
+    return (
+      <div id="usermenu" className="usermenucontainer">
+          <h2 className="greeter"> Hello {this.state.user ? this.state.user : "User"}</h2>
+          <h4 onClick={() => this.adminVerification()} style={{cursor: "pointer", display: "block"}}>Create a new content</h4>
+          <h4 onClick={() => this.setState({ mode: "browse_uploads", vid_id: null, tree_id: null, user: this.state.user })} style={{cursor: "pointer", display: "block"}}>Your Uploads</h4>
+          <h4 onClick={() => this.setState({ mode: "browse_favorites", vid_id: null, tree_id: null, user: this.state.user })} style={{cursor: "pointer", display: "block"}}>Favorites</h4>
+          <h4 onClick={() => this.logOutFunction()} style={{cursor: "pointer", display: "block", color: "red"}}>Log out</h4>
+      </div>
+    );
+  }
+
+  getMainContent()
+  {
+    if(this.state.mode.includes("browse"))
+    {
+      return(<BrowserContent app_parent={this} mode={this.state.mode.replace("browse_","")}/>);
+    }
+    else
+    {
+      return(<Editor/>)
     }
   }
 
@@ -78,7 +95,6 @@ class App extends Component
 
 initPlayer(treeid,id)
 {
-  console.log("Launching video...")
   this.setState({ mode: "video_play", vid_id: id, tree_id: treeid, user: this.state.user });
 }
 

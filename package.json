@@ -13,7 +13,8 @@
     "react-dom": "^16.13.1",
     "react-router-dom": "^5.2.0",
     "react-scripts": "^3.4.3",
-    "screenfull": "^5.0.2"
+    "screenfull": "^5.0.2",
+    "video-previews": "^1.0.4"
   },
   "scripts": {
     "start": "react-scripts start",
