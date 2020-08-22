@@ -64,12 +64,13 @@ class Player extends Component
     {
         let resp = await fetch("https://interact-server.herokuapp.com/get-video/" + this.props.vid_id)
         .then(r => r.json());
-        document.getElementById("like-indicator").innerHTML = resp.likes;
+        document.getElementById("like-indicator").innerHTML = resp[0].likes;
 
         if(this.props.app_parent.state.user)
         {
             let resp2 = await fetch("http://interact-server.herokuapp.com/get-fav-videos/" + this.props.app_parent.state.user)
                                 .then(r => r.json());
+            resp2 = resp2[0];
             for(let x = 0; x < resp2.likes.length; x++)
             {
                 if(resp2.likes[x] == this.props.vid_id)
@@ -96,9 +97,9 @@ class Player extends Component
         if(cookies.session_token)
         {
             let action = undefined;
-            if(this.state.liked == true) action = "removelike";
-            else if(this.state.liked == false) action = "addlike";
-            let resp = await fetch("https://interact-server.herokuapp.com/interaction-" + action,{
+            if(this.state.liked == true) action = "remove";
+            else if(this.state.liked == false) action = "add";
+            let resp = await fetch("https://interact-server.herokuapp.com/like/" + action,{
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
@@ -110,7 +111,7 @@ class Player extends Component
 
             if(resp == "OK")
             {
-                if(action == "addlike")
+                if(action == "add")
                 {
                     document.getElementById("like-button").className = "like liked";
                     document.getElementById("like-indicator").innerHTML = Number(document.getElementById("like-indicator").innerHTML) + 1;
@@ -118,7 +119,7 @@ class Player extends Component
                         final: this.state.final, choices: this.state.choices, time_when_choice: this.state.time_when_choice, 
                         liked: true})
                 }
-                else if(action == "removelike")
+                else if(action == "remove")
                 {
                     document.getElementById("like-button").className = "like";
                     document.getElementById("like-indicator").innerHTML = Number(document.getElementById("like-indicator").innerHTML) - 1;

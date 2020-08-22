@@ -96,6 +96,7 @@ class LogInModal extends Component
 
   async attemptRegister()
   {
+    let status = undefined;
     let resp = await fetch("https://interact-server.herokuapp.com/register",{
             method: 'POST',
             headers: {
@@ -105,15 +106,16 @@ class LogInModal extends Component
                    password: document.getElementById("rpsw").value,
                    fullname: document.getElementById("fname").value})
         })
-        .then(r => r.text());
-    if(resp.includes("Registration successful")){
-      let notification = (<div className="notification info"><p>You can now log in with registered credentials!</p></div>);
-      ReactDOM.render(notification,document.getElementById("notifications"))
+        .then(function(r) {
+                status = r.status; 
+                return r.text()});
+    if(status == 201){
       this.setState({mode: "login"});
+      ReactDOM.render(<div className="notification info"><p>You can now log in!</p></div>,document.getElementById("notifications"));
     }
     else
     {
-      let notification = (<div className="notification error"><p>{resp}</p></div>);
+      let notification = (<div className="notification error"><p>{status != 500 ? resp : "An unknown error occurred"}</p></div>);
       ReactDOM.render(notification,document.getElementById("notifications"))
     }
   }
