@@ -24,6 +24,11 @@ class App extends Component
     if(cookies.session_user) this.setState({ mode: this.state.mode, vid_id: this.state.vid_id, tree_id: this.state.tree_id, user: cookies.session_user})
   }
 
+  componentDidUpdate()
+  {
+    if (this.state.mode.includes("browse") || this.state.mode == "editor") document.getElementById("usermenu").style.display = "none";
+  }
+
   render()
   {
     if (this.state.mode.includes("browse") || this.state.mode == "editor") {

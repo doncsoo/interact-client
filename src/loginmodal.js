@@ -37,7 +37,7 @@ class LogInModal extends Component
       <label for="psw"><b>Password</b></label>
       <input type="password" placeholder="Enter Password" name="psw" id="psw" required/>
       <br></br>
-      <button onClick={() => this.attemptLogIn()} type="submit" class="black">Login</button>
+      <button onClick={() => this.attemptLogIn()} type="submit" className="black">Login</button>
       <br/>
     </div>
     <div className="logincontainer" style={{backgroundColor:"#f1f1f1"}}>

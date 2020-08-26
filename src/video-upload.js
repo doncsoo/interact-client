@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import './App.css';
+import loadinggif from './loading.gif';
+import videoselect from './videoselect.png';
 
 class VideoUpload extends Component
 {
@@ -10,15 +12,18 @@ class VideoUpload extends Component
   render()
   {
       return (
-        <div>
-        <h1>Upload your videos</h1>
+        <div className="video-upload">
+        <h2 style={{color: "white"}}>Upload your videos you wish to use during editing</h2>
+        <label style={{color: "white"}}>The video format must be MP4</label>
         <br/>
-        <input type="file" accept=".mp4" id="upload-file"/>
-        <br/>
-        <button onClick={() => this.getRequest()}>Send</button>
-        <h1>Your uploaded content</h1>
+        <label for="upload-file">
+        <img className="video-select" src={videoselect} width="150" height="90"/>
+        </label>
+        <input type="file" accept=".mp4" id="upload-file" onInput={() => this.getRequest()}/>
         <div id="uploaded">
         </div>
+        <div id="upload_queue"/>
+        <button className="white">Next</button>
         </div>
       )
   }
@@ -34,18 +39,17 @@ class VideoUpload extends Component
   
   async getRequest()
   {
+    ReactDOM.render(<div><img src={loadinggif} width="32" height="32"/><label style={{color: "white", display: "inline"}}>Uploading {document.getElementById("upload-file").files[0].name}</label></div>,document.getElementById("upload_queue"))
     var id = this.makeid(10);
-    console.log("uploading video as " + id);
     var filetype = document.getElementById("upload-file").files[0].type;
-    //this.addVideoPreview(document.getElementById("upload-file").files[0].name)
     var response = await fetch("https://interact-server.herokuapp.com/upload-verify?file-name=" + id + "&file-type=" + filetype).then(r => r.json());
     this.uploadFile(document.getElementById("upload-file").files[0],response,id)
   }
   
-  async addVideoPreview(file)
+  async addVideoPreview(id)
   {
-    
-    ReactDOM.render(<div><img width="320" height="480" src="preview-1.jpg"/>{file.name}</div>,document.getElementById("uploaded"))
+    let objectURL = "http://interact-server.herokuapp.com/get-preview/" + id;
+    document.getElementById("uploaded").innerHTML += "<div><img width='139' height='80' src=" + objectURL + "/></div>"
   }
 
 async uploadFile(file,requestData,id){
@@ -61,6 +65,8 @@ async uploadFile(file,requestData,id){
     if(xhr.readyState === 4){
       if(xhr.status === 200){
         alert('File successfully uploaded');
+        ReactDOM.unmountComponentAtNode(document.getElementById("upload_queue"));
+        this.addVideoPreview(id);
       }
       else{
         alert('Could not upload file.');

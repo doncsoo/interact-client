@@ -70,8 +70,9 @@ async queryVideos(user)
 
 async queryFavorites()
 {
-  let resp = await fetch("https://interact-server.herokuapp.com/get-fav-videos/" + this.props.app_parent.state.user, {cache: "no-store"})
+  let resp = await fetch("https://interact-server.herokuapp.com/get-fav-videos/" + this.props.app_parent.state.user)
         .then(r => r.json());
+  resp = resp[0];
   let entries = []
   for(var i = 0 ; i < resp.length; i++)
   {
