@@ -6,9 +6,6 @@ import videoselect from './videoselect.png';
 
 class VideoUpload extends Component
 {
-
-  state = {}
-
   render()
   {
       return (
@@ -16,14 +13,15 @@ class VideoUpload extends Component
         <h2 style={{color: "white"}}>Upload your videos you wish to use during editing</h2>
         <label style={{color: "white"}}>The video format must be MP4</label>
         <br/>
-        <label for="upload-file">
+        <label htmlFor="upload-file">
         <img className="video-select" src={videoselect} width="150" height="90"/>
         </label>
         <input type="file" accept=".mp4" id="upload-file" onInput={() => this.getRequest()}/>
         <div id="uploaded">
+        {this.props.editor_parent.getVideoPreviews()}
         </div>
         <div id="upload_queue"/>
-        <button className="white">Next</button>
+        <button onClick={() => this.props.editor_parent.setState({mode: "edit"})} className="white">Next</button>
         </div>
       )
   }
@@ -45,12 +43,6 @@ class VideoUpload extends Component
     var response = await fetch("https://interact-server.herokuapp.com/upload-verify?file-name=" + id + "&file-type=" + filetype).then(r => r.json());
     this.uploadFile(document.getElementById("upload-file").files[0],response,id)
   }
-  
-  async addVideoPreview(id)
-  {
-    let objectURL = "http://interact-server.herokuapp.com/get-preview/" + id;
-    document.getElementById("uploaded").innerHTML += "<div><img width='139' height='80' src=" + objectURL + "/></div>"
-  }
 
 async uploadFile(file,requestData,id){
   if(requestData == null || requestData == "Upload failed")
@@ -66,7 +58,9 @@ async uploadFile(file,requestData,id){
       if(xhr.status === 200){
         alert('File successfully uploaded');
         ReactDOM.unmountComponentAtNode(document.getElementById("upload_queue"));
-        this.addVideoPreview(id);
+        let temp_videos = this.props.editor_parent.state.videos;
+        temp_videos.push(id);
+        this.props.editor_parent.setState({mode: "upload", videos: temp_videos});
       }
       else{
         alert('Could not upload file.');
