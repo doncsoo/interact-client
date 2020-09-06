@@ -548,7 +548,7 @@ color: white;
   border-radius: 10px;
   top: 78%;
   left: 1%;
-  overflow-x: auto;
+  overflow-y: auto;
 }
 
 .editor-props {
@@ -559,4 +559,35 @@ color: white;
   border: 2px solid white;
   border-radius: 10px;
   left: 78%;
+  top: 10%;
+  transition: opacity 0.3s linear;
+  padding: 10px;
+}
+
+.editor-content {
+  position: absolute;
+  border: 2px solid grey;
+  width: 100vw;
+  height: 90vh;
+  z-index: 0;
+}
+
+.empty-video:before {
+  content: url(videoselect_grey.png);
+}
+
+.empty-video, .filled-video {
+  position: absolute;
+  top: 10%;
+  left: 40%;
+}
+
+.selector {
+  display: flex;
+  height: 35px;
+  width: 141px;
+}
+
+.selected {
+  border: 2px solid white;
 }

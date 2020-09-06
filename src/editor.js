@@ -26,15 +26,21 @@ class Editor extends Component
       
   }
 
-  getVideoPreviews()
+  getVideoPreviews(draggable = false)
   {
     let obj = [];
     for(let id of this.state.videos)
     {
       let objectURL = "http://interact-server.herokuapp.com/get-preview/" + id;
-      obj.push(<div className="drag-vid"><img width='139' height='80' src={objectURL}/></div>);
+      if(draggable) obj.push(<div className="drag-vid"><img vidid={id} onDragStart={(ev) => this.dragStart(ev)} draggable="true" width='139' height='80' src={objectURL}/></div>);
+      else obj.push(<div className="drag-vid"><img width='139' height='80' src={objectURL}/></div>);
     }
     return obj;
+  }
+
+  dragStart(ev)
+  {
+    ev.dataTransfer.setData("vidid", ev.target.getAttribute("vidid"));
   }
 }
 
