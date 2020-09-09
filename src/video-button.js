@@ -11,7 +11,7 @@ class VideoButton extends Component
   render()
   {
       return (
-          <div style={{cursor: "pointer"}} onClick={() => this.props.initPlayer(this.props.tree_id,this.props.vid_id)} id="video-button">
+          <div style={{cursor: "pointer"}} onClick={() => this.props.initPlayer(this.props.tree,this.props.vid_id)} id="video-button">
           <img id={"preview" + this.props.vid_id} width="200px" height="120px"></img>
           <div>
           <label style={{cursor: "pointer"}} style={{paddingBottom: "5px", paddingLeft: "5px", fontSize: "20px"}}><b>{this.props.title}</b></label>

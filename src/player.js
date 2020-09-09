@@ -11,18 +11,16 @@ class Player extends Component
 
     async componentDidMount()
     {
-        var jsontree = await fetch("https://interact-videos.s3.eu-central-1.amazonaws.com/selection_trees/" + this.props.tree_id + ".json").then(r => r.json());
         this.getLikes();
-        this.setState({tree : jsontree, current_video: "start", 
-        final: false, choices: [], time_when_choice: null, liked: null})
-        this.handleEvent("start")
+        this.setState({tree : this.props.tree, current_video: "start", 
+        final: false, choices: [], time_when_choice: null, liked: null},() => this.handleEvent("start"));
     }
 
     render() {
         return (<div className="container" id="video1">
         <div id="video-comp" className="c-video">
         <div id="header">
-        <button className="close" onClick={() => this.props.app_parent.setState({ mode: "browse_main", vid_id: null, tree_id: null, user: this.props.app_parent.state.user })}/>
+        <button className="close" onClick={() => this.props.app_parent.setState({ mode: "browse_main", vid_id: null, tree: null, user: this.props.app_parent.state.user })}/>
         <h2 style={{marginBottom: "1px"}}>{!this.state.tree ? null : this.state.tree.video_title}</h2>
         <button id="like-button" title={!this.props.app_parent.user ? "Log in to use this functionality" : ""} onClick={() => this.processLike()} style={{display: "inline", paddingRight: "10px"}} className="like"/>
         <h3 id="like-indicator" style={{display: "inline"}}>-</h3>
@@ -49,12 +47,12 @@ class Player extends Component
         </div>
         <div style={{display: "none"}} id="end-title">
             <h2>The content has ended.</h2>
-            <button className="white" onClick={() => this.props.app_parent.setState({ mode: "browse_main", vid_id: null, tree_id: null, user: this.props.app_parent.state.user })}>Return to main menu</button>
+            <button className="white" onClick={() => this.props.app_parent.setState({ mode: "browse_main", vid_id: null, tree: null, user: this.props.app_parent.state.user })}>Return to main menu</button>
         </div>
         <div style={{display: "none"}} id="error-screen">
             <h2>An error occurred.</h2>
             <h3>Please try again later.</h3>
-            <button className="white" onClick={() => this.props.app_parent.setState({ mode: "browse_main", vid_id: null, tree_id: null, user: this.props.app_parent.state.user })}>Return to main menu</button>
+            <button className="white" onClick={() => this.props.app_parent.setState({ mode: "browse_main", vid_id: null, tree: null, user: this.props.app_parent.state.user })}>Return to main menu</button>
         </div>
        </div>
     )
