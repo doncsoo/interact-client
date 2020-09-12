@@ -554,7 +554,7 @@ color: white;
 .editor-props {
   position: absolute;
   width: 20%;
-  height: 80vh;
+  height: 50vh;
   background-color: white;
   border: 2px solid white;
   border-radius: 10px;
@@ -562,6 +562,7 @@ color: white;
   top: 10%;
   transition: opacity 0.3s linear;
   padding: 10px;
+  overflow: auto;
 }
 
 .editor-content {
@@ -572,7 +573,7 @@ color: white;
   z-index: 0;
 }
 
-.empty-video:before {
+.empty-video:before, .empty-video-left:before, .empty-video-right:before, .empty-video-linear:before {
   content: url(videoselect_grey.png);
 }
 
@@ -580,6 +581,31 @@ color: white;
   position: absolute;
   top: 10%;
   left: 40%;
+}
+
+.empty-video-left {
+  position: absolute;
+  top: 37%;
+  left: 32%;
+}
+
+.empty-video-right {
+  position: absolute;
+  top: 37%;
+  left: 47.8%;
+}
+
+.empty-video-linear:before {
+  position: absolute;
+  top: 43%;
+  left: 40%;
+}
+
+.tree-branch{
+  position: absolute;
+  top: 19.5%;
+  left: 30.5%;
+  z-index: -1;
 }
 
 .selector {
@@ -590,4 +616,9 @@ color: white;
 
 .selected {
   border: 2px solid white;
+}
+
+line {
+  stroke:grey;
+  stroke-width:3;
 }
