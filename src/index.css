@@ -583,19 +583,19 @@ color: white;
   left: 40%;
 }
 
-.empty-video-left {
+.empty-video-left, .filled-video-left {
   position: absolute;
   top: 37%;
   left: 32%;
 }
 
-.empty-video-right {
+.empty-video-right, .filled-video-right {
   position: absolute;
   top: 37%;
   left: 47.8%;
 }
 
-.empty-video-linear:before {
+.empty-video-linear, .filled-video-linear {
   position: absolute;
   top: 43%;
   left: 40%;
