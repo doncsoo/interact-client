@@ -11,7 +11,12 @@ class Editor extends Component
 
   render()
   {
-      if(this.state.mode == "upload")
+      if(this.props.vid_id != null)
+      {
+        return (
+          <EditorContent editor_parent={this} vid_id={this.props.vid_id}/>)
+      }
+      else if(this.state.mode == "upload")
       {
         return (
             <VideoUpload editor_parent={this}/>
@@ -29,10 +34,7 @@ class Editor extends Component
   getVideoPreviews(draggable = false)
   {
     let obj = [];
-    //temp
-    let arr = this.state.videos;
-    arr.push("mGkVdxH2la");
-    for(let id of arr)
+    for(let id of this.state.videos)
     {
       let objectURL = "http://interact-server.herokuapp.com/get-preview/" + id;
       if(draggable) obj.push(<div className="drag-vid"><img vidid={id} onDragStart={(ev) => this.dragStart(ev)} draggable="true" width='139' height='80' src={objectURL}/></div>);

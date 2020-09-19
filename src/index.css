@@ -423,6 +423,13 @@ color: white;
   width: 20%; /* Could be more or less, depending on screen size */
 }
 
+/* Modal Content/Box */
+.modal-content2 {
+  background-color: #fefefe;
+  margin: 5px auto; /* 15% from the top and centered */
+  border: 1px solid #888;
+  width: 30%; /* Could be more or less, depending on screen size */
+}
 /* The Close Button */
 .close {
   /* Position it in the top right corner outside of the modal */

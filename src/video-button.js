@@ -10,7 +10,11 @@ class VideoButton extends Component
 
   render()
   {
+      let editor_buttons = null;
+      if(this.props.enableEditorOptions) 
+      editor_buttons = <button onClick={() => this.props.editVideo(this.props.vid_id)} className="black">Edit</button>;
       return (
+          <div>
           <div style={{cursor: "pointer"}} onClick={() => this.props.initPlayer(this.props.tree,this.props.vid_id)} id="video-button">
           <img id={"preview" + this.props.vid_id} width="200px" height="120px"></img>
           <div>
@@ -19,6 +23,8 @@ class VideoButton extends Component
           <label style={{paddingBottom: "5px", paddingLeft: "5px"}}> <b>Uploaded:</b> {this.props.upload_date.substring(0,10)}</label>
           <label style={{paddingBottom: "5px", paddingLeft: "5px", fontSize: "11px"}}>{this.props.description.substring(0,100)}</label>
           </div>
+          </div>
+          {editor_buttons}
           </div>
       )
   }

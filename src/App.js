@@ -76,7 +76,7 @@ class App extends Component
     }
     else
     {
-      return(<Editor/>)
+      return(<Editor app_parent={this} vid_id={this.state.vid_id}/>)
     }
   }
 
@@ -111,6 +111,16 @@ openLogInModal()
 setUser(set_user)
 {
   this.setState({ mode: this.state.mode, vid_id: this.state.vid_id, tree: this.state.tree, user: set_user });
+}
+
+backToMainPage()
+{
+  this.setState({ mode: "browse_main", vid_id: this.state.vid_id, tree: this.state.tree, user: this.state.user });
+}
+
+editVideo(id)
+{
+  this.setState({ mode: "editor", vid_id: id, tree: this.state.tree, user: this.state.user });
 }
 
 deRenderLogInModal()

@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import './App.css';
+import EditorFinalize from './editorfinalize';
+import Cookie from 'cookie';
 
 class EditorContent extends Component
 {
@@ -14,8 +16,26 @@ class EditorContent extends Component
       this.state = {tree_status: base_json, selected: null};
   }
 
+  componentDidMount()
+  {
+    if(this.props.vid_id != null) this.getTree();
+  }
+
+  async getTree()
+  {
+    console.log("fetching tree of " + this.props.vid_id);
+    let tree = await fetch("http://interact-server.herokuapp.com/get-tree/" + this.props.vid_id).then(r => r.json());
+    console.log(tree);
+    this.setState({tree_status: tree[0].tree, selected: null});
+  }
+
   render()
   {
+      let savebutton = null;
+      if(this.props.vid_id != null)
+      savebutton = <button style={{position: "absolute", top: "90%", left: "95%"}} onClick={() => ReactDOM.render(<EditorFinalize parent={this} editsave={true}/>,document.getElementById("popup"))} className="white">Save</button>;
+      else
+      savebutton = <button style={{position: "absolute", top: "90%", left: "95%"}} onClick={() => ReactDOM.render(<EditorFinalize parent={this} editsave={false}/>,document.getElementById("popup"))} className="white">Finalize</button>;
       return (
           <div className="editor">
           <div className="editor-content">
@@ -23,11 +43,17 @@ class EditorContent extends Component
           {this.getEditorByJSON()}
           </div>
           <button style={{position: "absolute", top: "90%", left: "85%"}} onClick={() => alert(JSON.stringify(this.state.tree_status))} className="white">Show content JSON</button>
-          <button style={{position: "absolute", top: "90%", left: "95%"}} className="white">Publish</button>
+          {savebutton}
           <div className="editor-videos">{this.props.editor_parent.getVideoPreviews(true)}</div>
           {this.getEditorProps()}
+          <div id="popup"></div>
           </div>
       )
+  }
+
+  deRenderFinModal()
+  {
+    ReactDOM.unmountComponentAtNode(document.getElementById("popup"));
   }
 
   getEditorProps()
@@ -319,6 +345,44 @@ class EditorContent extends Component
   selectVideo(id)
   {
     this.setState({tree_status: this.state.tree_status, selected: id});
+  }
+
+  async uploadContent(title,description,prev_id)
+  {
+    let json = this.state.tree_status;
+    json.video_title = title;
+    let cookies = Cookie.parse(document.cookie);
+    let resp = await fetch("https://interact-server.herokuapp.com/insert-content",{
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({name: title,
+                   desc: description,
+                   token: cookies.session_token,
+                   preview_id: prev_id,
+                   tree: JSON.stringify(json)}),
+        })
+        .then(r => r.text());
+    if(resp == "OK") return true;
+    else return false;
+  }
+
+  async saveContent()
+  {
+    let cookies = Cookie.parse(document.cookie);
+    let resp = await fetch("https://interact-server.herokuapp.com/edit-content",{
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({id: this.props.vid_id,
+                   token: cookies.session_token,
+                   tree: JSON.stringify(this.state.tree_status)})
+        })
+        .then(r => r.text());
+    if(resp == "OK") return true;
+    else return false;
   }
 }
 
