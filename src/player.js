@@ -29,6 +29,7 @@ class Player extends Component
             <img width="140" height="142" id="buffering" className="buffering hidden" src={loadinggif}/>
             <video id="video-src" src={this.fetchVideo()} onLoadStart={() => document.getElementById("buffering").className = "buffering"} onCanPlay={() => document.getElementById("buffering").className = "buffering hidden"} onWaiting={() => document.getElementById("buffering").className = "buffering"} onPlaying={() => this.getChoiceShowDuration()}  className="video" onEnded={() => this.endFunction()} onTimeUpdate={() => this.checkChoiceShow()} onError={() => this.globalError()} autoPlay></video>
             <div id="choice-time-ran-out" className="pop-up-msg hidden">No choice was made in the time limit, a random choice was selected.</div>
+            <div id="butterflylogo" className="butterflylogo hidden"></div>
             <div className="hidden" id="choices">
             <div id="inner-choices"></div>
             </div>
@@ -272,6 +273,8 @@ class Player extends Component
             if(this.state.choices.includes(vidobj.event.required_choices[j]))
             {
                 this.changeCurrentVideo(vidobj.event.gateway[j],null)
+                document.getElementById("butterflylogo").className = "butterflylogo shown";
+                setTimeout(() => document.getElementById("butterflylogo").className = "butterflylogo hidden",5000);
                 return
             }
         }

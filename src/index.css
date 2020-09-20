@@ -260,6 +260,25 @@ button.closeblack:before {
   content: url(closeblack.svg);
 }
 
+.butterflylogo:before {
+  content: url(butterflywhite.png);
+}
+
+.butterflylogo {
+  position: absolute;
+  display: flex;
+  left: 5%;
+  transform: translateX(-50%);
+  top: 15%;
+  margin: auto;
+  transition: opacity 0.5s linear;
+}
+
+#video-container:fullscreen .butterflylogo {
+  top: 2%;
+  left: 3%;
+}
+
 button.close:hover {
   opacity: 1;
 }
