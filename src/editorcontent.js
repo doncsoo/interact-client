@@ -37,14 +37,17 @@ class EditorContent extends Component
       else
       savebutton = <button style={{position: "absolute", top: "90%", left: "95%"}} onClick={() => ReactDOM.render(<EditorFinalize parent={this} editsave={false}/>,document.getElementById("popup"))} className="white">Finalize</button>;
       return (
-          <div className="editor">
+          <div>
           <div className="editor-content">
           <button onClick={() => this.setState({tree_status: this.state.tree_status, selected: this.getParent(this.state.selected),butterfly_selected: null})} style={{position: "absolute", top: "1%", left: "1%"}} className="white">Go to parent</button>
           {this.getEditorByJSON()}
           </div>
           <button style={{position: "absolute", top: "90%", left: "85%"}} onClick={() => alert(JSON.stringify(this.state.tree_status))} className="white">Show content JSON</button>
           {savebutton}
-          <div className="editor-videos">{this.props.editor_parent.getVideoPreviews(true)}</div>
+          <div className="editor-videos">
+          <button style={{display: "block"}} onClick={() => this.props.editor_parent.setState({mode: "upload", videos: this.props.editor_parent.state.videos})} className="white">Upload videos</button>
+          {this.props.editor_parent.getVideoPreviews(true)}
+          </div>
           {this.getEditorProps()}
           <div id="popup"></div>
           </div>
@@ -256,7 +259,7 @@ class EditorContent extends Component
         if(vidobj.event.gateway.two)
         {
           let url2 = "http://interact-server.herokuapp.com/get-preview/" + vidobj.event.gateway.two;
-          video_grids.push(<div onClick={(ev) => this.selectVideo(vidobj.event.gateway.two)} className="filled-video-right"><img width='139' height='80' src={url2}/><h2>#2</h2></div>);
+          video_grids.push(<div onDrop={(ev) => this.dropChoice(ev,"two")} onDragOver={(ev) => ev.preventDefault()} onClick={(ev) => this.selectVideo(vidobj.event.gateway.two)} className="filled-video-right"><img width='139' height='80' src={url2}/><h2>#2</h2></div>);
         }
         else video_grids.push(<div onDrop={(ev) => this.dropChoice(ev,"two")} onDragOver={(ev) => ev.preventDefault()} className="empty-video-right"><h2>#2</h2></div>);
 
@@ -276,7 +279,7 @@ class EditorContent extends Component
         if(vidobj.event.gateway)
         {
           let url = "http://interact-server.herokuapp.com/get-preview/" + vidobj.event.gateway;
-          video_grid = <div onClick={(ev) => this.selectVideo(vidobj.event.gateway)} className="filled-video-linear"><img width='139' height='80' src={url}/></div>;
+          video_grid = <div onDrop={(ev) => this.dropLinear(ev)} onDragOver={(ev) => ev.preventDefault()} onClick={(ev) => this.selectVideo(vidobj.event.gateway)} className="filled-video-linear"><img width='139' height='80' src={url}/></div>;
         }
         else video_grid = <div onDrop={(ev) => this.dropLinear(ev)} onDragOver={(ev) => ev.preventDefault()} className="empty-video-linear"/>;
         
@@ -308,7 +311,7 @@ class EditorContent extends Component
           if(vidobj.event.gateway[index] != undefined)
           {
             let url = "http://interact-server.herokuapp.com/get-preview/" + vidobj.event.gateway[index];
-            video_grid = <div onClick={(ev) => this.selectVideo(vidobj.event.gateway[index])} className="filled-video-linear"><img width='139' height='80' src={url}/></div>;
+            video_grid = <div onDrop={(ev) => this.dropButterfly(ev)} onDragOver={(ev) => ev.preventDefault()} onClick={(ev) => this.selectVideo(vidobj.event.gateway[index])} className="filled-video-linear"><img width='139' height='80' src={url}/></div>;
           }
           else video_grid = <div onDrop={(ev) => this.dropButterfly(ev)} onDragOver={(ev) => ev.preventDefault()} className="empty-video-linear"/>;
         }
@@ -328,6 +331,11 @@ class EditorContent extends Component
   {
     ev.preventDefault();
     let id = ev.dataTransfer.getData("vidid");
+    if(this.videoPresentInTree(id))
+    {
+      alert("This video is already present in the tree. Please remove it before using it elsewhere!");
+      return;
+    }
     if(this.state.selected)
     {
       this.generateJSON("gateway" + which,this.state.selected, id);
@@ -339,6 +347,11 @@ class EditorContent extends Component
   {
     ev.preventDefault();
     let id = ev.dataTransfer.getData("vidid");
+    if(this.videoPresentInTree(id))
+    {
+      alert("This video is already present in the tree. Please remove it before using it elsewhere!");
+      return;
+    }
     if(this.state.selected)
     {
       this.generateJSON("lineargateway",this.state.selected, id);
@@ -350,6 +363,11 @@ class EditorContent extends Component
   {
     ev.preventDefault();
     let id = ev.dataTransfer.getData("vidid");
+    if(this.videoPresentInTree(id))
+    {
+      alert("This video is already present in the tree. Please remove it before using it elsewhere!");
+      return;
+    }
     if(this.state.selected)
     {
       this.generateJSON("butterfly",this.state.selected, [this.state.butterfly_selected,id]);
@@ -429,7 +447,25 @@ class EditorContent extends Component
         } 
       }
     }
+  }
 
+  videoPresentInTree(id)
+  {
+    let json = this.state.tree_status;
+    if(json.start_video.id == id) return true;
+    else
+    {
+      for(let video of json.videos)
+      {
+        if(video.id == id) return true;
+      }
+      return false;
+    }
+  }
+
+  deleteVideo(id)
+  {
+    //pending
   }
 
   selectVideo(id)
