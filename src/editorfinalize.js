@@ -6,13 +6,13 @@ import loadingblack from './loadingblack.gif';
 
 class EditorFinalize extends Component
 {
-  state = {mode: undefined, vid_id: null}
+  state = {mode: undefined, vid_id: null, preview: null}
 
   constructor(props)
   {
       super(props);
       if(props.editsave == true) this.processSave();
-      else this.state = {mode: "overview", vid_id: null};
+      else this.state = {mode: "overview", vid_id: null, preview: null};
   }
 
   render()
@@ -39,11 +39,7 @@ class EditorFinalize extends Component
       <input type="text" name="conttitle" id="conttitle" size="30"/>
       <label for="desc"><b>Content Description</b></label>
       <textarea name="desc" id="desc" rows="4" cols="40"/>
-      <label><b>(Optional) Upload a preview image</b></label>
-      <label htmlFor="upload-file">
-      <img className="video-select" src={videoselect} width="150" height="90"/>
-      </label>
-      <input type="file" accept="image/*" id="upload-file" onInput={() => this.getRequest()}/>
+      {this.getPreviewImgHtml()}
       <button onClick={() => this.processUpload()} className="black">Publish</button>
       </div>);
     }
@@ -75,21 +71,103 @@ class EditorFinalize extends Component
     }
   }
 
+  getPreviewImgHtml()
+  {
+    if(this.state.preview == null)
+    {
+      return (
+      <div>
+      <label><b>(Optional) Upload a preview image</b></label>
+      <label htmlFor="upload-file">
+      <img className="video-select" src={videoselect} width="150" height="90"/>
+      </label>
+      <input type="file" accept="image/*" id="upload-file" onInput={() => this.getRequest()}/>
+      </div>
+      )
+    }
+    else if(this.state.preview == "PENDING")
+    {
+      return (
+        <div>
+        <label><b>(Optional) Upload a preview image</b></label>
+        <img width="70" height="75" src={loadingblack}/>
+        </div>
+      )
+    }
+    else
+    {
+      let prev_url = "https://interact-videos.s3.eu-central-1.amazonaws.com/previews/" + this.state.preview;
+      return (
+        <div>
+        <label><b>Selected preview image</b></label>
+        <img src={prev_url} width="150" height="90"/>
+        </div>
+        )
+    }
+  }
+
   async processSave()
   {
-      this.setState({mode : "loading", vid_id: null});
+      this.setState({mode : "loading", vid_id: null, preview: this.state.preview});
       let result = await this.props.parent.saveContent();
-      if(result == true) this.setState({mode: "save", vid_id : null});
-      else this.setState({mode: "error", vid_id : null});
+      if(result == true) this.setState({mode: "save", vid_id : null, preview: this.state.preview});
+      else this.setState({mode : "error", vid_id: null, preview: this.state.preview});
   }
 
   async processUpload()
   {
-      this.setState({mode : "loading", vid_id: null});
-      let result = await this.props.parent.uploadContent(document.getElementById("conttitle").value,document.getElementById("desc").value,null);
-      if(result == true) this.setState({mode: "success", vid_id : null});
-      else this.setState({mode: "error", vid_id : null});
+      this.setState({mode : "loading", vid_id: null, preview: this.state.preview});
+      let result = await this.props.parent.uploadContent(document.getElementById("conttitle").value,document.getElementById("desc").value, this.state.preview);
+      if(result == true) this.setState({mode: "success", vid_id : null, preview: this.state.preview});
+      else this.setState({mode : "error", vid_id: null, preview: this.state.preview});
+  }
 
+  makeid(length) {
+    let result           = '';
+    var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    for ( var i = 0; i < length; i++ ) {
+       result += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    return result;
+  }
+
+  async getRequest()
+  {
+    let file = document.getElementById("upload-file").files[0];
+    var filetype = document.getElementById("upload-file").files[0].type;
+    if(!filetype.includes("image"))
+    {
+      alert("ERROR: The selected image is not in a correct format.");
+      return;
+    }
+    this.setState({mode: this.state.mode, vid_id: this.state.vid_id, preview: "PENDING"});
+    var id = this.makeid(10);
+    var response = await fetch("https://interact-server.herokuapp.com/upload-verify-image?file-name=" + id + "&file-type=" + filetype).then(r => r.json());
+    this.uploadFile(file,response,id);
+  }
+
+  async uploadFile(file,requestData,id){
+    if(requestData == null || requestData == "Upload failed")
+    {
+      console.log("Upload aborted, signed request query failed...")
+      return;
+    }
+    const xhr = new XMLHttpRequest();
+    xhr.open('PUT', requestData.signedRequest);
+    xhr.setRequestHeader('x-amz-acl', 'public-read');
+    xhr.onreadystatechange = async () => {
+      if(xhr.readyState === 4){
+        if(xhr.status === 200){
+          alert('File successfully uploaded');
+          this.setState({mode : this.state.mode, vid_id: this.state.vid_id, preview: id})
+        }
+        else{
+          alert('Could not upload file.');
+          this.setState({mode: this.state.mode, vid_id: this.state.vid_id, preview: null});
+        }
+      }
+    };
+    xhr.send(file);
   }
 
   componentDidMount()

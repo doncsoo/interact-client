@@ -37,9 +37,14 @@ class VideoUpload extends Component
   
   async getRequest()
   {
+    var filetype = document.getElementById("upload-file").files[0].type;
+    if(filetype != "video/mp4")
+    {
+      alert("ERROR: The selected video is not in a correct format.");
+      return;
+    }
     ReactDOM.render(<div><img src={loadinggif} width="32" height="32"/><label style={{color: "white", display: "inline"}}>Uploading {document.getElementById("upload-file").files[0].name}</label></div>,document.getElementById("upload_queue"))
     var id = this.makeid(10);
-    var filetype = document.getElementById("upload-file").files[0].type;
     var response = await fetch("https://interact-server.herokuapp.com/upload-verify?file-name=" + id + "&file-type=" + filetype).then(r => r.json());
     this.uploadFile(document.getElementById("upload-file").files[0],response,id)
   }

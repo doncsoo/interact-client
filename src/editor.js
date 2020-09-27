@@ -40,9 +40,7 @@ class Editor extends Component
   getVideoPreviews(draggable = false)
   {
     let obj = [];
-    let arr = this.state.videos;
-    arr.push("13ZhK1u5W2")
-    for(let id of arr)
+    for(let id of this.state.videos)
     {
       let objectURL = "http://interact-server.herokuapp.com/get-preview/" + id;
       if(draggable) obj.push(<div className="drag-vid"><img vidid={id} onDragStart={(ev) => this.dragStart(ev)} draggable="true" width='139' height='80' src={objectURL}/></div>);

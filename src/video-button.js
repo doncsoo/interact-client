@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import './App.css';
 import blankpreview from './blank-preview.png'
+import Cookie from 'cookie';
 
 class VideoButton extends Component
 {
@@ -10,9 +11,12 @@ class VideoButton extends Component
 
   render()
   {
-      let editor_buttons = null;
-      if(this.props.enableEditorOptions) 
-      editor_buttons = <button onClick={() => this.props.editVideo(this.props.vid_id)} className="black">Edit</button>;
+      let editor_buttons = [];
+      if(this.props.enableEditorOptions)
+      {
+        editor_buttons.push(<button onClick={() => this.props.editVideo(this.props.vid_id)} className="black">Edit</button>);
+        editor_buttons.push(<button onClick={() => this.deleteVideo()} className="black">Delete</button>);
+      }
       return (
           <div>
           <div style={{cursor: "pointer"}} onClick={() => this.props.initPlayer(this.props.tree,this.props.vid_id)} id="video-button">
@@ -47,6 +51,31 @@ class VideoButton extends Component
             })
       }
       else img.src = blankpreview;
+  }
+
+  async deleteVideo()
+  {
+      let confirm_res = window.confirm("Are you want to delete this content?");
+      if(confirm_res == true)
+      {
+        let cookies = Cookie.parse(document.cookie);
+        let resp = await fetch("https://interact-server.herokuapp.com/delete-content",{
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                   token: cookies.session_token,
+                   id: this.props.vid_id}),
+        })
+        .then(r => r.text());
+        console.log(resp);
+        if(resp == "OK")
+        {
+            alert("The content was deleted.");
+            this.location.reload();
+        }
+      }
   }
 }
 
