@@ -39,7 +39,10 @@ class EditorContent extends Component
       return (
           <div>
           <div className="editor-content">
-          <button onClick={() => this.setState({tree_status: this.state.tree_status, selected: this.getParent(this.state.selected),butterfly_selected: null})} style={{position: "absolute", top: "1%", left: "1%"}} className="white">Go to parent</button>
+          <button onClick={() => this.toggleNavigation()} style={{position: "absolute", top: "1%", left: "1%"}} className="white">Navigate</button>
+          <div style={{display: "none"}} id="editor-navigation" className="editor-navigation">
+          {this.getNavigationContent()}
+          </div>
           {this.getEditorByJSON()}
           </div>
           <button style={{position: "absolute", top: "90%", left: "85%"}} onClick={() => alert(JSON.stringify(this.state.tree_status))} className="white">Show content JSON</button>
@@ -52,6 +55,14 @@ class EditorContent extends Component
           <div id="popup"></div>
           </div>
       )
+  }
+
+  toggleNavigation()
+  {
+    let state = document.getElementById("editor-navigation").style.display;
+    console.log(state);
+    if(state == "block") document.getElementById("editor-navigation").style.display = "none";
+    else if(state == "none") document.getElementById("editor-navigation").style.display = "block";
   }
 
   deRenderFinModal()
@@ -227,7 +238,7 @@ class EditorContent extends Component
       else
       {
         let url = "http://interact-server.herokuapp.com/get-preview/" + this.state.tree_status.start_video.id;
-        return <div><div onClick={(ev) => this.selectVideo("start_video")} className="filled-video"><img width='139' height='80' src={url}/></div>
+        return <div><div onDrop={(ev) => this.dropSelected(ev)} onDragOver={(ev) => ev.preventDefault()} onClick={() => this.selectVideo("start_video")} className="filled-video"><img width='139' height='80' src={url}/></div>
         {this.getEventSpecificEditor(this.getVideoObjInJSON("start_video"))}
         </div>
       }
@@ -236,7 +247,7 @@ class EditorContent extends Component
     {
       let vidobj = this.getVideoObjInJSON(this.state.selected);
       let url = "http://interact-server.herokuapp.com/get-preview/" + vidobj.id;
-        return <div><div onClick={(ev) => this.selectVideo(this.state.selected)} className="filled-video"><img width='139' height='80' src={url}/></div>
+        return <div><div onDrop={(ev) => this.dropSelected(ev)} onDragOver={(ev) => ev.preventDefault()} onClick={() => this.selectVideo(this.state.selected)} className="filled-video"><img width='139' height='80' src={url}/></div>
         {this.getEventSpecificEditor(this.getVideoObjInJSON(this.state.selected))}
         </div>
     }
@@ -252,7 +263,7 @@ class EditorContent extends Component
         if(vidobj.event.gateway.one)
         {
           let url1 = "http://interact-server.herokuapp.com/get-preview/" + vidobj.event.gateway.one;
-          video_grids.push(<div onClick={(ev) => this.selectVideo(vidobj.event.gateway.one)} className="filled-video-left"><img width='139' height='80' src={url1}/><h2>#1</h2></div>);
+          video_grids.push(<div onDrop={(ev) => this.dropChoice(ev,"one")} onDragOver={(ev) => ev.preventDefault()} onClick={() => this.selectVideo(vidobj.event.gateway.one)} className="filled-video-left"><img width='139' height='80' src={url1}/><h2>#1</h2></div>);
         }
         else video_grids.push(<div onDrop={(ev) => this.dropChoice(ev,"one")} onDragOver={(ev) => ev.preventDefault()} className="empty-video-left"><h2>#1</h2></div>);
 
@@ -325,6 +336,29 @@ class EditorContent extends Component
       else return null;
     }
     else return null;
+  }
+
+  getNavigationContent()
+  {
+    let navigation_buttons = [];
+    console.log(this.state.tree_status.start_video);
+    if(this.state.tree_status.start_video != null)
+    {
+      let start_url = "http://interact-server.herokuapp.com/get-preview/" + this.state.tree_status.start_video.id;
+      navigation_buttons.push(
+        <button style={{border: "none", background: "none"}} onClick={(ev) => this.setState({tree_status: this.state.tree_status, selected: "start_video", butterfly_selected: null})}><div style={{display: "flex"}}><img width='139' height='80' src={start_url}/><h3 style={{color: "black", paddingLeft: "5px"}}>{this.state.tree_status.start_video.title ?? "<no title>"}</h3><label>START</label></div></button>);
+      for(let video of this.state.tree_status.videos)
+      {
+        let url = "http://interact-server.herokuapp.com/get-preview/" + video.id;
+        navigation_buttons.push(
+          <button style={{border: "none", background: "none"}} onClick={(ev) => this.setState({tree_status: this.state.tree_status, selected: video.id, butterfly_selected: null})}><div style={{display: "flex"}}><img width='139' height='80' src={url}/><h3 style={{color: "black", paddingLeft: "5px"}}>{video.title ?? "<no title>"}</h3></div></button>);
+      }
+      return navigation_buttons;
+    }
+    else
+    {
+      return <label>No videos present yet.</label>;
+    }
   }
 
   dropChoice(ev,which)
@@ -461,11 +495,6 @@ class EditorContent extends Component
       }
       return false;
     }
-  }
-
-  deleteVideo(id)
-  {
-    //pending
   }
 
   selectVideo(id)

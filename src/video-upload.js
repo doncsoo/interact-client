@@ -13,11 +13,11 @@ class VideoUpload extends Component
         <h2 style={{color: "white"}}>Upload your videos you wish to use during editing</h2>
         <label style={{color: "white"}}>The video format must be MP4</label>
         <br/>
+        <div id="uploaded">
         <label htmlFor="upload-file">
         <img className="video-select" src={videoselect} width="150" height="90"/>
         </label>
         <input type="file" accept=".mp4" id="upload-file" onInput={() => this.getRequest()}/>
-        <div id="uploaded">
         {this.props.editor_parent.getVideoPreviews()}
         </div>
         <div id="upload_queue"/>

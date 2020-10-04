@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import './App.css';
-import blankpreview from './blank-preview.png'
+import blankpreview from './blank-preview.png';
 import Cookie from 'cookie';
 
 class VideoButton extends Component
