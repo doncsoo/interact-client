@@ -11,9 +11,7 @@ class Player extends Component
 
     async componentDidMount()
     {
-        this.getLikes();
-        this.setState({tree : this.props.tree, current_video: "start", 
-        final: false, choices: [], time_when_choice: null, liked: null},() => this.handleEvent("start"));
+        this.preLaunchFunction();
     }
 
     render() {
@@ -48,23 +46,44 @@ class Player extends Component
         </div>
         <div style={{display: "none"}} id="end-title">
             <h2>The content has ended.</h2>
-            <button className="white" onClick={() => this.props.app_parent.setState({ mode: "browse_main", vid_id: null, tree: null, user: this.props.app_parent.state.user })}>Return to main menu</button>
+            <button className="white" onClick={() => this.props.app_parent.setState({ mode: "browse_main", vid_id: null, tree: null, user: this.props.app_parent.state.user })}>Return to main page</button>
         </div>
         <div style={{display: "none"}} id="error-screen">
             <h2>An error occurred.</h2>
             <h3>Please try again later.</h3>
-            <button className="white" onClick={() => this.props.app_parent.setState({ mode: "browse_main", vid_id: null, tree: null, user: this.props.app_parent.state.user })}>Return to main menu</button>
+            <button className="white" onClick={() => this.props.app_parent.setState({ mode: "browse_main", vid_id: null, tree: null, user: this.props.app_parent.state.user })}>Return to main page</button>
+        </div>
+        <div style={{display: "none"}} id="prereq-missing">
+            <h2>This content requires prerequisite.</h2>
+            <h4 style={{color: "white"}}>Please complete the following content first.</h4>
+            {this.get}
+            <button className="white" onClick={() => this.props.app_parent.setState({ mode: "browse_main", vid_id: null, tree: null, user: this.props.app_parent.state.user })}>Return to main page</button>
         </div>
        </div>
     )
     };
 
-    async getLikes()
+    async preLaunchFunction()
     {
         let resp = await fetch("https://interact-server.herokuapp.com/get-video/" + this.props.vid_id)
         .then(r => r.json());
         document.getElementById("like-indicator").innerHTML = resp[0].likes;
+        if(resp[0].prerequisite != null)
+        {
+            let prereq = await this.getPreReqChoices(resp[0].prerequisite);
+            if(prereq == false)
+            {
+                console.log("false");
+                return;
+            }
+        }
+        this.getLikes();
+        this.setState({tree : this.props.tree, current_video: "start", 
+        final: false, choices: [], time_when_choice: null, liked: null},() => this.handleEvent("start"));
+    }
 
+    async getLikes()
+    {
         if(this.props.app_parent.state.user)
         {
             let resp2 = await fetch("http://interact-server.herokuapp.com/get-fav-videos/" + this.props.app_parent.state.user)
@@ -87,6 +106,27 @@ class Player extends Component
                 final: this.state.final, choices: this.state.choices, time_when_choice: this.state.time_when_choice, 
                 liked: false})
         }
+    }
+
+    async getPreReqChoices(prereq_id)
+    {
+        let cookies = Cookie.parse(document.cookie);
+        let resp = await fetch("https://interact-server.herokuapp.com/prereq-choices",{
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                   username: cookies.session_user,
+                   vidid: this.props.vid_id}),
+        }).then(r => r.json());
+        if(resp.length == 0)
+        {
+            document.getElementById("video-comp").style.display = "none";
+            document.getElementById("prereq-missing").style.display = "block";
+            return false;
+        }
+        else return true;
     }
 
     async processLike()
@@ -362,6 +402,27 @@ class Player extends Component
     {
         document.getElementById("video-comp").style.display = "none";
         document.getElementById("error-screen").style.display = "block";
+    }
+
+    getPreRequisiteVideoComponent()
+    {
+        let resp = fetch("https://interact-server.herokuapp.com/get-video/" + this.props.vid_id)
+        .then(r => r.json());
+
+        let prereq = fetch("https://interact-server.herokuapp.com/get-video/" + resp[0].prerequisite)
+        .then(r => r.json());
+
+        if(prereq.length == 0) return null;
+
+        let prereq_prev = "https://interact-videos.s3.eu-central-1.amazonaws.com/previews/" + prereq[0].preview_id;
+
+        return (<div style={{cursor: "pointer"}} onClick={() => this.props.initPlayer(this.props.tree,this.props.vid_id)} id="video-button">
+        <img src={prereq_prev} id="prereqpreview" width="200px" height="120px"></img>
+        <div>
+        <label style={{cursor: "pointer"}} style={{paddingBottom: "5px", paddingLeft: "5px", fontSize: "20px"}}><b>{prereq[0].name}</b></label>
+        <label style={{paddingBottom: "5px", paddingLeft: "5px", fontSize: "11px"}}>{prereq[0].description.substring(0,100)}</label>
+        </div>
+        </div>);
     }
 }
 
