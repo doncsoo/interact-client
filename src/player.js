@@ -56,7 +56,10 @@ class Player extends Component
         <div style={{display: "none"}} id="prereq-missing">
             <h2>This content requires prerequisite.</h2>
             <h4 style={{color: "white"}}>Please complete the following content first.</h4>
-            {this.get}
+            <div id="prereq">
+            <img width="75" height="78" id="prereq_loading" src={loadinggif}/>
+            </div>
+            <br></br>
             <button className="white" onClick={() => this.props.app_parent.setState({ mode: "browse_main", vid_id: null, tree: null, user: this.props.app_parent.state.user })}>Return to main page</button>
         </div>
        </div>
@@ -71,11 +74,7 @@ class Player extends Component
         if(resp[0].prerequisite != null)
         {
             let prereq = await this.getPreReqChoices(resp[0].prerequisite);
-            if(prereq == false)
-            {
-                console.log("false");
-                return;
-            }
+            if(prereq == false) return;
         }
         this.getLikes();
         this.setState({tree : this.props.tree, current_video: "start", 
@@ -118,12 +117,13 @@ class Player extends Component
             },
             body: JSON.stringify({
                    username: cookies.session_user,
-                   vidid: this.props.vid_id}),
+                   vidid: prereq_id}),
         }).then(r => r.json());
         if(resp.length == 0)
         {
             document.getElementById("video-comp").style.display = "none";
             document.getElementById("prereq-missing").style.display = "block";
+            this.getPreRequisiteVideoComponent();
             return false;
         }
         else return true;
@@ -385,6 +385,7 @@ class Player extends Component
         {
            document.getElementById("video-comp").style.display = "none";
            document.getElementById("end-title").style.display = "block";
+           this.uploadChoices();
         }
         else {
            this.videoDurationEnded()
@@ -404,25 +405,40 @@ class Player extends Component
         document.getElementById("error-screen").style.display = "block";
     }
 
-    getPreRequisiteVideoComponent()
+    async getPreRequisiteVideoComponent()
     {
-        let resp = fetch("https://interact-server.herokuapp.com/get-video/" + this.props.vid_id)
+        let resp = await fetch("https://interact-server.herokuapp.com/get-video/" + this.props.vid_id)
         .then(r => r.json());
 
-        let prereq = fetch("https://interact-server.herokuapp.com/get-video/" + resp[0].prerequisite)
+        let prereq = await fetch("https://interact-server.herokuapp.com/get-video/" + resp[0].prerequisite)
         .then(r => r.json());
-
-        if(prereq.length == 0) return null;
 
         let prereq_prev = "https://interact-videos.s3.eu-central-1.amazonaws.com/previews/" + prereq[0].preview_id;
 
-        return (<div style={{cursor: "pointer"}} onClick={() => this.props.initPlayer(this.props.tree,this.props.vid_id)} id="video-button">
+        ReactDOM.render(<div style={{cursor: "pointer"}} id="video-button">
         <img src={prereq_prev} id="prereqpreview" width="200px" height="120px"></img>
         <div>
-        <label style={{cursor: "pointer"}} style={{paddingBottom: "5px", paddingLeft: "5px", fontSize: "20px"}}><b>{prereq[0].name}</b></label>
-        <label style={{paddingBottom: "5px", paddingLeft: "5px", fontSize: "11px"}}>{prereq[0].description.substring(0,100)}</label>
+        <label style={{color:"white", cursor: "pointer"}} style={{paddingBottom: "5px", paddingLeft: "5px", fontSize: "20px"}}><b style={{color: "white"}}>{prereq[0].name}</b></label>
+        <label style={{color:"white", paddingBottom: "5px", paddingLeft: "5px", fontSize: "11px"}}>{prereq[0].description.substring(0,100)}</label>
         </div>
-        </div>);
+        </div>,document.getElementById("prereq"));
+    }
+
+    async uploadChoices()
+    {
+        let cookies = Cookie.parse(document.cookie);
+        let resp = await fetch("https://interact-server.herokuapp.com/upload-choices",{
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                   username: cookies.session_user,
+                   vidid: this.props.vid_id,
+                   choices: this.state.choices}),
+        }).then(r => r.text());
+        if(resp == "OK") console.log("choices successfully uploaded");
+        else console.log("choice upload failed");
     }
 }
 
