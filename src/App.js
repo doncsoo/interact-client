@@ -48,11 +48,10 @@ class App extends Component
       return (<div><Player app_parent={this} vid_id={this.state.vid_id} tree={this.state.tree}/></div>)
     }
   }
-   //temp function
-  adminVerification(func)
+
+  launchEditor()
   {
-    if(this.state.user == "admin") this.setState({ mode: "editor", vid_id: null, tree: null, user: this.state.user });
-    else alert("This feature requires admin authorization.")
+    this.setState({ mode: "editor", vid_id: null, tree: null, user: this.state.user });
   }
 
   getUserMenu()
@@ -60,7 +59,7 @@ class App extends Component
     return (
       <div id="usermenu" className="usermenucontainer">
           <h2 className="greeter"> Hello {this.state.user ? this.state.user : "User"}</h2>
-          <h4 onClick={() => this.adminVerification()} style={{cursor: "pointer", display: "block"}}>Create a new content</h4>
+          <h4 onClick={() => this.launchEditor()} style={{cursor: "pointer", display: "block"}}>Create a new content</h4>
           <h4 onClick={() => this.setState({ mode: "browse_uploads", vid_id: null, tree: null, user: this.state.user })} style={{cursor: "pointer", display: "block"}}>Your Uploads</h4>
           <h4 onClick={() => this.setState({ mode: "browse_favorites", vid_id: null, tree: null, user: this.state.user })} style={{cursor: "pointer", display: "block"}}>Favorites</h4>
           <h4 onClick={() => this.logOutFunction()} style={{cursor: "pointer", display: "block", color: "red"}}>Log out</h4>

@@ -319,15 +319,14 @@ class Player extends Component
         {
             if(this.state.choices.includes(vidobj.event.required_choices[j]))
             {
-                this.changeCurrentVideo(vidobj.event.gateway[j],null)
+                this.changeCurrentVideo(vidobj.event.gateway[j],null);
                 document.getElementById("butterflylogo").className = "butterflylogo shown";
                 setTimeout(() => document.getElementById("butterflylogo").className = "butterflylogo hidden",5000);
-                return
+                return;
             }
         }
-        //BUG if butterfly choice not found
-        this.setState({final: true})
-        this.endFunction()
+
+        this.endFunction(true);
     }
 
     randomizeSelection(vidobj)
@@ -386,16 +385,16 @@ class Player extends Component
         return null;
     }
 
-    endFunction()
+    endFunction(autoend = false)
     {
-        if(this.state.final == true)
+        if(this.state.final == true || autoend == true)
         {
            document.getElementById("video-comp").style.display = "none";
            document.getElementById("end-title").style.display = "block";
            this.uploadChoices();
         }
         else {
-           this.videoDurationEnded()
+           this.videoDurationEnded();
         }
 
     }
