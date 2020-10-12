@@ -9,16 +9,18 @@ class Editor extends Component
 
   state = {mode: "upload", videos: []}
 
+  constructor(props)
+  {
+    super(props);
+    if(this.props.vid_id != null)
+    {
+      this.state = {mode: "edit", videos: []};
+    }
+  }
+
   render()
   {
-      if(this.props.vid_id != null)
-      {
-        return (
-          <div className="editor">
-          <EditorContent editor_parent={this} vid_id={this.props.vid_id}/>
-          </div>)
-      }
-      else if(this.state.mode == "upload")
+      if(this.state.mode == "upload")
       {
         return (
           <div className="editor">
@@ -30,7 +32,7 @@ class Editor extends Component
       {
         return (
           <div className="editor">
-          <EditorContent editor_parent={this}/>
+          <EditorContent editor_parent={this} vid_id={this.props.vid_id ?? undefined}/>
           </div>
         )
       }

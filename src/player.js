@@ -78,7 +78,7 @@ class Player extends Component
         }
         this.getLikes();
         this.setState({tree : this.props.tree, current_video: "start", 
-        final: false, choices: [], time_when_choice: null, liked: null},() => this.handleEvent("start"));
+        final: false, choices: this.state.choices, time_when_choice: null, liked: null},() => this.handleEvent("start"));
     }
 
     async getLikes()
@@ -126,7 +126,14 @@ class Player extends Component
             this.getPreRequisiteVideoComponent();
             return false;
         }
-        else return true;
+        else
+        {
+            //using prereq choices
+            this.setState({tree : null, current_video: null, 
+                final: false, choices: resp[0].choices, time_when_choice: null, 
+                liked: null});
+            return true;
+        }
     }
 
     async processLike()
