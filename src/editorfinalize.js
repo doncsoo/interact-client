@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import './App.css';
 import videoselect from './videoselect_grey.png';
 import loadingblack from './loadingblack.gif';
+import Cookies from 'cookie'
 
 class EditorFinalize extends Component
 {
@@ -13,6 +14,12 @@ class EditorFinalize extends Component
       super(props);
       if(props.editsave == true) this.processSave();
       else this.state = {mode: "overview", vid_id: null, preview: null};
+  }
+
+  async componentDidMount()
+  {
+    document.getElementById('id01').style.display="block";
+    this.renderAllVideosList();
   }
 
   render()
@@ -40,6 +47,9 @@ class EditorFinalize extends Component
       <label for="desc"><b>Content Description</b></label>
       <textarea name="desc" id="desc" rows="4" cols="40"/>
       {this.getPreviewImgHtml()}
+      <label><b>Prerequisite (optional)</b></label>
+      <select name="prereq" id="prereq"/>
+      <br></br>
       <button onClick={() => this.processUpload()} className="black">Publish</button>
       </div>);
     }
@@ -69,6 +79,23 @@ class EditorFinalize extends Component
       <button onClick={() => this.props.parent.props.editor_parent.props.app_parent.backToMainPage()} className="black">Back to main menu</button>
       </div>);
     }
+  }
+
+  async renderAllVideosList()
+  {
+    console.log("fetching all videos for prereq comp");
+    let list = [];
+    list.push(<option value="none">None (default)</option>);
+    let cookies = Cookies.parse(document.cookie)
+    let resp = await fetch("https://interact-server.herokuapp.com/get-videos/" + cookies.session_user, {cache: "no-store"})
+        .then(r => r.json());
+    console.log(resp);
+    for(let vid of resp)
+    {
+      list.push(<option value={vid.id}>{vid.name}</option>);
+    }
+
+    ReactDOM.render(list,document.getElementById("prereq"));
   }
 
   getPreviewImgHtml()
@@ -117,7 +144,7 @@ class EditorFinalize extends Component
   async processUpload()
   {
       this.setState({mode : "loading", vid_id: null, preview: this.state.preview});
-      let result = await this.props.parent.uploadContent(document.getElementById("conttitle").value,document.getElementById("desc").value, this.state.preview);
+      let result = await this.props.parent.uploadContent(document.getElementById("conttitle").value,document.getElementById("desc").value, this.state.preview, document.getElementById("prereq").value);
       if(result == true) this.setState({mode: "success", vid_id : null, preview: this.state.preview});
       else this.setState({mode : "error", vid_id: null, preview: this.state.preview});
   }
@@ -168,11 +195,6 @@ class EditorFinalize extends Component
       }
     };
     xhr.send(file);
-  }
-
-  componentDidMount()
-  {
-    document.getElementById('id01').style.display="block";
   }
 }
 

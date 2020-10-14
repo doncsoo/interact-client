@@ -129,6 +129,7 @@ class EditorContent extends Component
             <option value="none">Select one!</option>
             {choices.map((c) => { return <option value={c}>{c}</option>})}
           </select>
+          <div style={{display: "block"}} id="prereq_import"><button className="black">Import choices</button></div>
           <label><b>Already bound choices:</b></label>
           <ul>
             {alreadybound}
@@ -502,7 +503,7 @@ class EditorContent extends Component
     this.setState({tree_status: this.state.tree_status, selected: id, butterfly_selected: null});
   }
 
-  async uploadContent(title,description,prev_id)
+  async uploadContent(title,description,prev_id,prerequisite)
   {
     let json = this.state.tree_status;
     json.video_title = title;
@@ -516,7 +517,8 @@ class EditorContent extends Component
                    desc: description,
                    token: cookies.session_token,
                    preview_id: prev_id,
-                   tree: JSON.stringify(json)}),
+                   tree: JSON.stringify(json),
+                   prereq: prerequisite != "none" ? prerequisite : null}),
         })
         .then(r => r.text());
     if(resp == "OK") return true;
