@@ -3,17 +3,18 @@ import ReactDOM from 'react-dom';
 import './App.css';
 import EditorFinalize from './editorfinalize';
 import Cookie from 'cookie';
+import loadinggif from './loadingblack.gif';
 
 class EditorContent extends Component
 {
 
   state = {tree_status: undefined, selected: null, butterfly_selected: null}
 
-  constructor()
+  constructor(props)
   {
-      super();
-      const base_json = {"video_title": "", "start_video": null, "videos": []};
-      this.state = {tree_status: base_json, selected: null, butterfly_selected: null};
+      super(props);
+      if(props.vid_id == null) this.state = {tree_status: props.editor_parent.state.tree_status, selected: null, butterfly_selected: null};
+      else this.state = {tree_status: {"video_title": "", "start_video": null, "videos": []}, selected: null, butterfly_selected: null};
   }
 
   componentDidMount()
@@ -48,13 +49,42 @@ class EditorContent extends Component
           <button style={{position: "absolute", top: "90%", left: "85%"}} onClick={() => alert(JSON.stringify(this.state.tree_status))} className="white">Show content JSON</button>
           {savebutton}
           <div className="editor-videos">
-          <button style={{display: "block"}} onClick={() => this.props.editor_parent.setState({mode: "upload", videos: this.props.editor_parent.state.videos})} className="white">Upload videos</button>
+          <button style={{display: "block"}} onClick={() => this.props.editor_parent.setState({mode: "upload", tree_status: this.state.tree_status, videos: this.props.editor_parent.state.videos, imported: this.props.editor_parent.state.imported})} className="white">Upload videos</button>
           {this.props.editor_parent.getVideoPreviews(true)}
           </div>
           {this.getEditorProps()}
           <div id="popup"></div>
           </div>
       )
+  }
+
+  async prereqPopUp()
+  {
+    document.getElementById("prereq_loading").className = "shown";
+    let list = [];
+    list.push(<option value="none">None (default)</option>);
+    let cookies = Cookie.parse(document.cookie)
+    let resp = await fetch("https://interact-server.herokuapp.com/get-videos/" + cookies.session_user, {cache: "no-store"})
+        .then(r => r.json());
+    for(let vid of resp)
+    {
+      list.push(<option value={vid.id}>{vid.name}</option>);
+    }
+
+    ReactDOM.render(
+      <div id="id01" className="modal" style={{display: "block"}}>
+      <div className="modal-content3 animate">
+      <button style={{margin: "5px", display: "inline"}} onClick={() => ReactDOM.unmountComponentAtNode(document.getElementById("popup"))} className="closeblack"/>
+      <div id="logincontainer">
+      <h2 style={{color: "black"}}>
+      Select an existing content!
+      </h2>
+      <select id="prereq_list">{list}</select>
+      <button onClick={() => { this.props.editor_parent.importChoices(document.getElementById("prereq_list").value) 
+                               ReactDOM.unmountComponentAtNode(document.getElementById("popup"))}} className="black">Import</button>
+      </div>
+      </div>
+      </div>,document.getElementById("popup"),() => {document.getElementById("prereq_loading").className = "hidden"});
   }
 
   toggleNavigation()
@@ -129,7 +159,7 @@ class EditorContent extends Component
             <option value="none">Select one!</option>
             {choices.map((c) => { return <option value={c}>{c}</option>})}
           </select>
-          <div style={{display: "block"}} id="prereq_import"><button className="black">Import choices</button></div>
+          <button onClick={() => this.prereqPopUp()} className="black">Import choices</button><img id="prereq_loading" className="hidden" src={loadinggif} width="32" height="32"/>
           <label><b>Already bound choices:</b></label>
           <ul>
             {alreadybound}
@@ -300,7 +330,7 @@ class EditorContent extends Component
         </svg>
         {video_grid}</div>);
       }
-      else if(vidobj.event.type == "butterfly" && this.state.butterfly_selected != null)
+      else if(vidobj.event.type == "butterfly" && this.state.butterfly_selected != null && this.state.butterfly_selected != "none")
       {
         let video_grid = null;
 
@@ -444,7 +474,8 @@ class EditorContent extends Component
         }
       }
     }
-    return choices;
+    
+    return choices.concat(this.props.editor_parent.state.imported);
   }
 
   vidObjEventContains(vidobj,id)

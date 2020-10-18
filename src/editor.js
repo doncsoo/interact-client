@@ -7,14 +7,16 @@ import EditorContent from './editorcontent';
 class Editor extends Component
 {
 
-  state = {mode: "upload", videos: []}
+  state = {mode: "upload", tree_status: null, videos: [], imported: []}
 
   constructor(props)
   {
     super(props);
+    const base_json = {"video_title": "", "start_video": null, "videos": []};
+    this.state = {mode: "upload", tree_status: base_json, videos: [], imported: []}
     if(this.props.vid_id != null)
     {
-      this.state = {mode: "edit", videos: []};
+      this.state = {mode: "edit", tree_status: null, videos: [], imported: []};
     }
   }
 
@@ -54,6 +56,35 @@ class Editor extends Component
   dragStart(ev)
   {
     ev.dataTransfer.setData("vidid", ev.target.getAttribute("vidid"));
+  }
+
+  async importChoices(vidid)
+  {
+    let impchoices = [];
+    let resp = await fetch("http://interact-server.herokuapp.com/get-tree/" + vidid, {cache: "no-store"})
+        .then(r => r.json());
+    let tree = resp[0].tree;
+    if (tree.start_video.event.type == "choice")
+    {
+      impchoices.push(tree.start_video.event.choices.one);
+      impchoices.push(tree.start_video.event.choices.two);
+    }
+
+    for(let vid of tree.videos)
+    {
+      if(vid.event != null)
+      {
+        if(vid.event.type == "choice")
+        {
+          impchoices.push(vid.event.choices.one);
+          impchoices.push(vid.event.choices.two);
+        }
+      }
+    }
+
+    this.setState({mode: this.state.mode, tree_status: this.state.tree_status, 
+      videos: this.state.videos, imported: this.state.imported.concat(impchoices)});
+    alert("Choices from the selected content successfully imported.");
   }
 }
 
