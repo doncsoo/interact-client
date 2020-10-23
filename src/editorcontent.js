@@ -132,6 +132,8 @@ class EditorContent extends Component
       {
         return (
           <div>
+          <label for="duration"><b>Choice Duration</b></label>
+          <input type="number" onChange={(ev) => this.generateJSON("duration",this.state.selected,ev.target.value)} value={vidobj.event.duration ?? ""} name="duration" id="duration"/>
           <label for="choiceone"><b>Choice #1</b></label>
           <input type="text" onChange={(ev) => this.generateJSON("choiceone",this.state.selected,ev.target.value)} value={vidobj.event.choices.one ?? ""} name="choiceone" id="choiceone"/>
           <label for="choicetwo"><b>Choice #2</b></label>
@@ -219,6 +221,9 @@ class EditorContent extends Component
         break;
       case "choicetwo":
         ptr.event.choices.two = data;
+        break;
+      case "duration":
+        ptr.event.duration = Number(data);
         break;
       case "gatewayone":
         ptr.event.gateway.one = data;

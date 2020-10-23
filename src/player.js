@@ -110,15 +110,21 @@ class Player extends Component
     async getPreReqChoices(prereq_id)
     {
         let cookies = Cookie.parse(document.cookie);
-        let resp = await fetch("https://interact-server.herokuapp.com/prereq-choices",{
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                   username: cookies.session_user,
-                   vidid: prereq_id}),
-        }).then(r => r.json());
+        let resp = undefined;
+        //if(cookies.session_user && cookies.session_token)
+        //{
+            resp = await fetch("https://interact-server.herokuapp.com/prereq-choices",{
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                       token: cookies.session_token,
+                       vidid: prereq_id}),
+            }).then(r => r.json());
+        //}
+        //else resp = [];
+        console.log(resp);
         if(resp.length == 0)
         {
             document.getElementById("video-comp").style.display = "none";
@@ -433,18 +439,22 @@ class Player extends Component
     async uploadChoices()
     {
         let cookies = Cookie.parse(document.cookie);
-        let resp = await fetch("https://interact-server.herokuapp.com/upload-choices",{
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                   username: cookies.session_user,
-                   vidid: this.props.vid_id,
-                   choices: this.state.choices}),
-        }).then(r => r.text());
-        if(resp == "OK") console.log("choices successfully uploaded");
-        else console.log("choice upload failed");
+        if(cookies.session_user != null && cookies.session_token != null)
+        {
+            let resp = await fetch("https://interact-server.herokuapp.com/upload-choices",{
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                       token: cookies.session_token,
+                       vidid: this.props.vid_id,
+                       choices: this.state.choices}),
+            }).then(r => r.text());
+            if(resp == "OK") console.log("choices successfully uploaded");
+            else console.log("choice upload failed");
+        }
+        else console.log("no choice uploaded - no login");
     }
 }
 

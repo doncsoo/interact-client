@@ -12,16 +12,26 @@ import userimg from './user.svg';
 import BrowserContent from './browsecontent';
 import Cookie from 'cookie';
 import Editor from './editor';
+import loadinggif from './loading.gif';
 
 class App extends Component
 {
   state = {mode: "browse_main", vid_id: null, tree: null, user: null}
 
-  componentDidMount()
+  async componentDidMount()
   {
     //try to pre authenticate
     let cookies = Cookie.parse(document.cookie)
-    if(cookies.session_user) this.setState({ mode: this.state.mode, vid_id: this.state.vid_id, tree: this.state.tree, user: cookies.session_user})
+    if(cookies.session_user)
+    {
+      this.setState({ mode: this.state.mode, vid_id: this.state.vid_id, tree: this.state.tree, user: "VALIDATING"});
+      let resp = await fetch("https://interact-server.herokuapp.com/verify-token/" + cookies.session_token).then(r => r.text());
+      if(resp == "VALID")
+      {
+        this.setState({ mode: this.state.mode, vid_id: this.state.vid_id, tree: this.state.tree, user: cookies.session_user});
+      }
+      else this.deleteCookies();
+    }
   }
 
   componentDidUpdate()
@@ -85,6 +95,10 @@ class App extends Component
     {
       return (<h3 style={{cursor: "pointer"}} onClick={() => this.openLogInModal()} className="log-in"><a>Log In</a></h3>);
     }
+    else if(this.state.user == "VALIDATING")
+    {
+      return (<img style={{cursor: "pointer"}} onClick={() => this.toggleUserMenu()} title={"Attempting to pre-authenticate"} width="32" height="32" src={loadinggif} className="log-in"/>);
+    }
     else
     {
       return (<img style={{cursor: "pointer"}} onClick={() => this.toggleUserMenu()} title={"Logged in as " + this.state.user} src={userimg} className="log-in"/>);
@@ -127,12 +141,17 @@ deRenderLogInModal()
   ReactDOM.unmountComponentAtNode(document.getElementById("login-modal-div"))
 }
 
-logOutFunction()
+deleteCookies()
 {
   document.cookie = "session_user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
   document.cookie = "session_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
   this.setState({ mode: "browse_main", vid_id: this.state.vid_id, tree: this.state.tree, user: null})
-  this.toggleUserMenu()
+}
+
+logOutFunction()
+{
+  this.deleteCookies();
+  this.toggleUserMenu();
 }
 }
 
