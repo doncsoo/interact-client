@@ -45,7 +45,7 @@ class App extends Component
       return (
         <div className="App">
          <div className="black-header">
-         <h2 onClick={() => this.setState({ mode: "browse_main", vid_id: null, tree: null, user: this.state.user })} style={{cursor: "pointer"}} className="logo">INTERACT</h2>
+         <h2 onClick={() => window.location.reload()} style={{cursor: "pointer"}} className="logo">INTERACT</h2>
          {this.getUserComp()}
          </div>
          {this.getUserMenu()}
