@@ -109,7 +109,10 @@ class EditorContent extends Component
       let url = "http://interact-server.herokuapp.com/get-preview/" + vidobj.id;
       return (<div className="editor-props shown">
       <h1 style={{margin: "5px"}}>Event Editor</h1>
+      <div style={{display: "flex"}}>
       <img width='230' height='120' src={url}/>
+      <div><button onClick={() => window.open("https://interact-videos.s3.eu-central-1.amazonaws.com/" + vidobj.id)} className="black">Preview</button></div>
+      </div>
       <label for="title"><b>Title</b></label>
       <input type="text" onChange={(ev) => this.generateJSON("title",this.state.selected, ev.target.value)} value={vidobj.title ?? ""} name="title" id="title"/>
       <label for="event"><b>Event</b></label>
@@ -176,7 +179,61 @@ class EditorContent extends Component
   dropSelected(ev) {
     ev.preventDefault();
     let id = ev.dataTransfer.getData("vidid");
-    if(!this.state.selected) this.generateJSON("start_video", null, {"title": "", "id": id, "event": null});
+    if(this.state.selected == null)
+    {
+      this.generateJSON("start_video", null, {"title": "", "id": id, "event": null});
+    }
+    else this.replaceSelected(this.state.selected,id);
+  }
+
+  replaceSelected(old_vidid,new_vidid)
+  {
+    if(old_vidid == "start_video") this.generateJSON("start_video", null, {"title": "", "id": new_vidid, "event": null});
+    else
+    {
+      let tree = this.state.tree_status;
+      if(tree.start_video.id == old_vidid) tree.start_video.id = new_vidid;
+      if(tree.start_video.event != null)
+      {
+          if(tree.start_video.event.type == "choice")
+          {
+            if(tree.start_video.event.gateway.one == old_vidid) tree.start_video.event.gateway.one = new_vidid;
+            if(tree.start_video.event.gateway.two == old_vidid) tree.start_video.event.gateway.two = new_vidid;
+          }
+          else if(tree.start_video.event.type == "linear")
+          {
+            if(tree.start_video.event.gateway == old_vidid) tree.start_video.event.gateway = new_vidid;
+          }
+          else if(tree.start_video.event.type == "butterfly")
+          {
+            let j = tree.start_video.event.gateway.indexOf(old_vidid);
+            tree.start_video.event.gateway[j] = new_vidid;
+          }
+      }
+      for(let i = 0; i < tree.videos.length; i++)
+      {
+        if(tree.videos[i].id == old_vidid) tree.videos[i].id = new_vidid;
+        if(tree.videos[i].event != null)
+        {
+          if(tree.videos[i].event.type == "choice")
+          {
+            if(tree.videos[i].event.gateway.one == old_vidid) tree.videos[i].event.gateway.one = new_vidid;
+            if(tree.videos[i].event.gateway.two == old_vidid) tree.videos[i].event.gateway.two = new_vidid;
+          }
+          else if(tree.videos[i].event.type == "linear")
+          {
+            if(tree.videos[i].event.gateway == old_vidid) tree.videos[i].event.gateway = new_vidid;
+          }
+          else if(tree.videos[i].event.type == "butterfly")
+          {
+            let j = tree.videos[i].event.gateway.indexOf(old_vidid);
+            tree.videos[i].event.gateway[j] = new_vidid;
+          }
+        }
+      }
+      console.log(tree);
+      this.setState({tree_status: tree, selected: new_vidid, butterfly_selected: this.state.butterfly_selected});
+    }
   }
 
   generateJSON(comp,id,data)
@@ -537,6 +594,16 @@ class EditorContent extends Component
   selectVideo(id)
   {
     this.setState({tree_status: this.state.tree_status, selected: id, butterfly_selected: null});
+  }
+
+  treeValidation()
+  {
+    //the start_video must contain one event
+    let tree = this.state.tree_status;
+    if(tree.start_video.event == null || tree.videos.length == 0)
+    {
+      alert("ERROR: The start video must contain an event!");
+    }
   }
 
   async uploadContent(title,description,prev_id,prerequisite)

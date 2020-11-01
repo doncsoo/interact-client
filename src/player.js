@@ -20,7 +20,7 @@ class Player extends Component
         <div id="header">
         <button className="close" onClick={() => this.props.app_parent.setState({ mode: "browse_main", vid_id: null, tree: null, user: this.props.app_parent.state.user })}/>
         <h2 style={{marginBottom: "1px"}}>{!this.state.tree ? null : this.state.tree.video_title}</h2>
-        <button id="like-button" title={!this.props.app_parent.user ? "Log in to use this functionality" : ""} onClick={() => this.processLike()} style={{display: "inline", paddingRight: "10px"}} className="like"/>
+        <button id="like-button" title={this.props.app_parent.user != null ? "Log in to use this functionality" : ""} onClick={() => this.processLike()} style={{display: "inline", paddingRight: "10px"}} className="like"/>
         <h3 id="like-indicator" style={{display: "inline"}}>-</h3>
         </div>
         <div id="video-container">
@@ -55,7 +55,7 @@ class Player extends Component
         </div>
         <div style={{display: "none"}} id="prereq-missing">
             <h2>This content requires prerequisite.</h2>
-            <h4 style={{color: "white"}}>Please complete the following content first.</h4>
+            <h4 style={{color: "white"}}>Please log in and complete the following content first.</h4>
             <div id="prereq">
             <img width="75" height="78" id="prereq_loading" src={loadinggif}/>
             </div>
