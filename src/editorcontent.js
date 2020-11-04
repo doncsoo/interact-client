@@ -611,8 +611,8 @@ class EditorContent extends Component
     let json = this.state.tree_status;
     json.video_title = title;
     let cookies = Cookie.parse(document.cookie);
-    let resp = await fetch("https://interact-server.herokuapp.com/insert-content",{
-            method: 'POST',
+    let resp = await fetch("https://interact-server.herokuapp.com/content",{
+            method: 'PUT',
             headers: {
               'Content-Type': 'application/json'
             },
@@ -631,7 +631,7 @@ class EditorContent extends Component
   async saveContent()
   {
     let cookies = Cookie.parse(document.cookie);
-    let resp = await fetch("https://interact-server.herokuapp.com/edit-content",{
+    let resp = await fetch("https://interact-server.herokuapp.com/content",{
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'

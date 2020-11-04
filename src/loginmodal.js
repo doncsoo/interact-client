@@ -98,7 +98,7 @@ class LogInModal extends Component
   {
     let status = undefined;
     let resp = await fetch("https://interact-server.herokuapp.com/register",{
-            method: 'POST',
+            method: 'PUT',
             headers: {
               'Content-Type': 'application/json'
             },

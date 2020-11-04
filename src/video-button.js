@@ -59,8 +59,8 @@ class VideoButton extends Component
       if(confirm_res == true)
       {
         let cookies = Cookie.parse(document.cookie);
-        let resp = await fetch("https://interact-server.herokuapp.com/delete-content",{
-            method: 'POST',
+        let resp = await fetch("https://interact-server.herokuapp.com/content",{
+            method: 'DELETE',
             headers: {
               'Content-Type': 'application/json'
             },

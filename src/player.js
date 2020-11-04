@@ -149,10 +149,10 @@ class Player extends Component
         if(cookies.session_token)
         {
             let action = undefined;
-            if(this.state.liked == true) action = "remove";
-            else if(this.state.liked == false) action = "add";
-            let resp = await fetch("https://interact-server.herokuapp.com/like/" + action,{
-            method: 'POST',
+            if(this.state.liked == true) action = "DELETE";
+            else if(this.state.liked == false) action = "PUT";
+            let resp = await fetch("https://interact-server.herokuapp.com/like",{
+            method: action,
             headers: {
               'Content-Type': 'application/json'
             },
@@ -163,7 +163,7 @@ class Player extends Component
 
             if(resp == "OK")
             {
-                if(action == "add")
+                if(action == "PUT")
                 {
                     document.getElementById("like-button").className = "like liked";
                     document.getElementById("like-indicator").innerHTML = Number(document.getElementById("like-indicator").innerHTML) + 1;
@@ -171,7 +171,7 @@ class Player extends Component
                         final: this.state.final, choices: this.state.choices, time_when_choice: this.state.time_when_choice, 
                         liked: true})
                 }
-                else if(action == "remove")
+                else if(action == "DELETE")
                 {
                     document.getElementById("like-button").className = "like";
                     document.getElementById("like-indicator").innerHTML = Number(document.getElementById("like-indicator").innerHTML) - 1;
