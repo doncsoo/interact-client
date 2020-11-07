@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
-import './App.css';
 import loadinggif from './loading.gif';
 import videoselect from './videoselect.png';
 
@@ -15,7 +14,7 @@ class VideoUpload extends Component
         <br/>
         <div id="uploaded">
         <label htmlFor="upload-file">
-        <img className="video-select" src={videoselect} width="150" height="90"/>
+          <img className="video-select" src={videoselect} width="150" height="90"/>
         </label>
         <input type="file" accept=".mp4" id="upload-file" onInput={() => this.getRequest()}/>
         {this.props.editor_parent.getVideoPreviews()}
@@ -40,12 +39,13 @@ class VideoUpload extends Component
     var filetype = document.getElementById("upload-file").files[0].type;
     if(filetype != "video/mp4")
     {
-      alert("ERROR: The selected video is not in a correct format.");
+      alert("ERROR: The selected file is not in a correct format.");
       return;
     }
     ReactDOM.render(<div><img src={loadinggif} width="32" height="32"/><label style={{color: "white", display: "inline"}}>Uploading {document.getElementById("upload-file").files[0].name}</label></div>,document.getElementById("upload_queue"))
     var id = this.makeid(10);
     var response = await fetch("https://interact-server.herokuapp.com/upload-verify?file-name=" + id + "&file-type=" + filetype).then(r => r.json());
+    document.getElementById("upload-file").disabled = true;
     this.uploadFile(document.getElementById("upload-file").files[0],response,id)
   }
 
@@ -66,6 +66,7 @@ async uploadFile(file,requestData,id){
         let temp_videos = this.props.editor_parent.state.videos;
         temp_videos.push(id);
         this.props.editor_parent.setState({mode: "upload", videos: temp_videos});
+        document.getElementById("upload-file").disabled = false;
       }
       else{
         alert('Could not upload file.');

@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import screenfull from 'screenfull';
-import './App.css';
 import loadinggif from './loading.gif';
 import Cookie from 'cookie';
 
@@ -11,7 +10,7 @@ class Player extends Component
 
     async componentDidMount()
     {
-        this.preLaunchFunction();
+       this.preLaunchFunction();
     }
 
     render() {

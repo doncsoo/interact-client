@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
-import './App.css';
 
 class LogInModal extends Component
 {
@@ -15,14 +14,14 @@ class LogInModal extends Component
   {
       return (
         <div>
-        <div id="id01" className="modal">
-        <div className="modal-content animate">
-        <button style={{margin: "5px", display: "inline"}} onClick={() => this.props.app_parent.deRenderLogInModal()} className="closeblack"/>
-        <div id="notifications"></div>
-          {this.getMainContent()}
+          <div className="modal">
+            <div className="modal-content animate">
+              <button style={{margin: "5px", display: "inline"}} onClick={() => ReactDOM.unmountComponentAtNode(document.getElementById("login-modal-div"))} className="closeblack"/>
+              <div id="notifications"></div>
+              {this.getMainContent()}
+            </div>
+          </div>
         </div>
-      </div>
-      </div>
       )
   }
 
@@ -30,44 +29,44 @@ class LogInModal extends Component
   {
     if(this.state.mode == "login")
     {
-      return (<div><div id="login" className="logincontainer">
-      <label for="uname"><b>Username</b></label>
-      <input type="text" placeholder="Enter Username" name="uname" id="uname" required/>
+      return (
+      <div>
+        <div id="login" className="logincontainer">
+          <label for="uname"><b>Username</b></label>
+          <input type="text" placeholder="Enter Username" name="uname" id="uname" required/>
 
-      <label for="psw"><b>Password</b></label>
-      <input type="password" placeholder="Enter Password" name="psw" id="psw" required/>
-      <br></br>
-      <button onClick={() => this.attemptLogIn()} type="submit" className="black">Login</button>
-      <br/>
-    </div>
-    <div className="logincontainer" style={{backgroundColor:"#f1f1f1"}}>
-    <button onClick={() => this.setState({mode: "register"})} className="black">Register</button>
-    </div>
-    </div>);
+          <label for="psw"><b>Password</b></label>
+          <input type="password" placeholder="Enter Password" name="psw" id="psw" required/>
+          <br/>
+          <button onClick={() => this.attemptLogIn()} type="submit" className="black">Login</button>
+          <br/>
+        </div>
+        <div className="logincontainer" style={{backgroundColor:"#f1f1f1"}}>
+          <button onClick={() => this.setState({mode: "register"})} className="black">Register</button>
+        </div>
+      </div>);
     }
     else if(this.state.mode == "register")
     {
-      return (<div><div id="register" className="logincontainer">
-      <label for="rname"><b>Username</b></label>
-      <input type="text" placeholder="Enter Username" name="rname" id="rname" required/>
+      return (
+      <div>
+        <div id="register" className="logincontainer">
+          <label for="rname"><b>Username</b></label>
+          <input type="text" placeholder="Enter Username" name="rname" id="rname" required/>
 
-      <label for="rpsw"><b>Password</b></label>
-      <input type="password" placeholder="Enter Password" name="rpsw" id="rpsw" required/>
+          <label for="rpsw"><b>Password</b></label>
+          <input type="password" placeholder="Enter Password" name="rpsw" id="rpsw" required/>
 
-      <label for="fname"><b>Full Name</b></label>
-      <input type="text" placeholder="Enter Fullname" name="fname" id="fname" required/>
-      <br/>
-      <button className="black" onClick={() => this.attemptRegister()} type="submit">Register</button>
-    </div>
-    <div className="logincontainer" style={{backgroundColor:"#f1f1f1"}}>
-    <button onClick={() => this.setState({mode: "login"})} className="black">Login</button>
-    </div></div>);
+          <label for="fname"><b>Full Name</b></label>
+          <input type="text" placeholder="Enter Fullname" name="fname" id="fname" required/>
+          <br/>
+          <button className="black" onClick={() => this.attemptRegister()} type="submit">Register</button>
+        </div>
+        <div className="logincontainer" style={{backgroundColor:"#f1f1f1"}}>
+          <button onClick={() => this.setState({mode: "login"})} className="black">Login</button>
+        </div>
+      </div>);
     }
-  }
-
-  componentDidMount()
-  {
-    document.getElementById('id01').style.display="block";
   }
 
   async attemptLogIn()
@@ -82,10 +81,10 @@ class LogInModal extends Component
         })
         .then(r => r.json());
     if(resp.verified == true){
-        this.props.app_parent.setUser(document.getElementById("uname").value);
-        document.cookie = "session_user=" + document.getElementById("uname").value;
-        document.cookie = "session_token=" + resp.token;    
-        this.props.app_parent.deRenderLogInModal();
+      this.props.app_parent.setUser(document.getElementById("uname").value);
+      document.cookie = "session_user=" + document.getElementById("uname").value;
+      document.cookie = "session_token=" + resp.token;    
+      ReactDOM.unmountComponentAtNode(document.getElementById("login-modal-div"));
     }
     else
     {
@@ -108,7 +107,8 @@ class LogInModal extends Component
         })
         .then(function(r) {
                 status = r.status; 
-                return r.text()});
+                return r.text()
+              });
     if(status == 201){
       this.setState({mode: "login"});
       ReactDOM.render(<div className="notification info"><p>You can now log in!</p></div>,document.getElementById("notifications"));

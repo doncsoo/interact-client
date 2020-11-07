@@ -1,6 +1,4 @@
 import React, {Component} from 'react';
-import ReactDOM from 'react-dom';
-import './App.css';
 import VideoUpload from './video-upload';
 import EditorContent from './editorcontent';
 
@@ -13,11 +11,8 @@ class Editor extends Component
   {
     super(props);
     const base_json = {"video_title": "", "start_video": null, "videos": []};
-    this.state = {mode: "upload", tree_status: base_json, videos: [], imported: []}
-    if(this.props.vid_id != null)
-    {
-      this.state = {mode: "edit", tree_status: null, videos: [], imported: []};
-    }
+    if(this.props.vid_id != null) this.state = {mode: "edit", tree_status: null, videos: [], imported: []};
+    else this.state = {mode: "upload", tree_status: base_json, videos: ["rRbdYDCY01"], imported: []};
   }
 
   render()
@@ -26,7 +21,7 @@ class Editor extends Component
       {
         return (
           <div className="editor">
-          <VideoUpload editor_parent={this}/>
+            <VideoUpload editor_parent={this}/>
           </div>
         )
       }
@@ -34,7 +29,7 @@ class Editor extends Component
       {
         return (
           <div className="editor">
-          <EditorContent editor_parent={this} vid_id={this.props.vid_id ?? undefined}/>
+            <EditorContent editor_parent={this} vid_id={this.props.vid_id ?? undefined}/>
           </div>
         )
       }
@@ -47,8 +42,8 @@ class Editor extends Component
     for(let id of this.state.videos)
     {
       let objectURL = "http://interact-server.herokuapp.com/get-preview/" + id;
-      if(draggable) obj.push(<div className="drag-vid"><img vidid={id} onDragStart={(ev) => this.dragStart(ev)} draggable="true" width='139' height='80' src={objectURL}/></div>);
-      else obj.push(<div className="drag-vid"><img width='139' height='80' src={objectURL}/></div>);
+      if(draggable) obj.push(<div className="drag-vid"><img className="inner-filled-video" loading="eager" title={id} vidid={id} onDragStart={(ev) => this.dragStart(ev)} draggable="true" width='139' height='80' src={objectURL}/></div>);
+      else obj.push(<div className="drag-vid"><img className="inner-filled-video" loading="eager" width='139' height='80' src={objectURL}/></div>);
     }
     return obj;
   }
@@ -85,6 +80,16 @@ class Editor extends Component
     this.setState({mode: this.state.mode, tree_status: this.state.tree_status, 
       videos: this.state.videos, imported: this.state.imported.concat(impchoices)});
     alert("Choices from the selected content successfully imported.");
+  }
+
+  getAlreadyPresentVideos()
+  {
+    let tree = this.state.tree_status;
+    let already_videos = [];
+    already_videos.push(tree.start_video.id);
+    for(let video of tree.videos) already_videos.push(video.id);
+    this.setState({mode: this.state.mode, tree_status: this.state.tree_status, 
+      videos: already_videos, imported: this.state.imported});
   }
 }
 

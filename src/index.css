@@ -422,7 +422,7 @@ color: white;
 
 /* The Modal (background) */
 .modal {
-  display: none; /* Hidden by default */
+  display: block; /* Hidden by default */
   position: fixed; /* Stay in place */
   z-index: 1; /* Sit on top */
   left: 0;
@@ -525,13 +525,13 @@ color: white;
 }
 
 .info {
-  background-color: lightgreen;
+  background-color: black;
 }
 
 .video-upload {
   background-color: black;
   width: 50%;
-  height: 250px;
+  height: 300px;
   position: absolute;
   border: 2px solid black;
   border-radius: 10px;
@@ -588,14 +588,15 @@ color: white;
 
 .editor-navigation {
   position: absolute;
-  width: 300px;
+  width: 18%;
   height: 60%;
   background-color: white;
   border: 2px solid white;
   border-radius: 10px;
-  top: 10%;
+  top: 13%;
   left: 1%;
   overflow: auto;
+  z-index: 1;
 }
 
 .editor-props {
@@ -614,10 +615,11 @@ color: white;
 
 .editor-content {
   position: absolute;
-  border: 2px solid grey;
-  width: 100vw;
-  height: 90vh;
-  z-index: 0;
+  width: 800px;
+  height: 500px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%,-50%);
 }
 
 .empty-video:before, .empty-video-left:before, .empty-video-right:before, .empty-video-linear:before {
@@ -627,31 +629,39 @@ color: white;
 .empty-video, .filled-video {
   position: absolute;
   top: 10%;
-  left: 40%;
+  left: 41%;
 }
 
 .empty-video-left, .filled-video-left {
   position: absolute;
-  top: 37%;
-  left: 32%;
+  top: 49%;
+  left: 22%;
 }
 
 .empty-video-right, .filled-video-right {
   position: absolute;
-  top: 37%;
-  left: 47.8%;
+  top: 49%;
+  left: 59%;
 }
 
 .empty-video-linear, .filled-video-linear {
   position: absolute;
-  top: 43%;
-  left: 40%;
+  top: 59%;
+  left: 40.5%;
+}
+
+.inner-filled-video {
+  border-radius: 5px;
+}
+
+.inner-filled-video:hover {
+  border: 3px solid white;
 }
 
 .tree-branch{
   position: absolute;
   top: 19.5%;
-  left: 30.5%;
+  left: 18%;
   z-index: -1;
 }
 

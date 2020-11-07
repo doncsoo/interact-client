@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
-import './App.css';
 import videoselect from './videoselect_grey.png';
 import loadingblack from './loadingblack.gif';
 import Cookies from 'cookie'
@@ -18,18 +17,17 @@ class EditorFinalize extends Component
 
   async componentDidMount()
   {
-    document.getElementById('id01').style.display="block";
     this.renderAllVideosList();
   }
 
   render()
   {
       return (
-        <div id="id01" className="modal">
-        <div className="modal-content2 animate">
-        <button style={{margin: "5px", display: "inline"}} onClick={() => this.props.parent.deRenderFinModal()} className="closeblack"/>
-        {this.getMainContent()}
-        </div>
+        <div className="modal">
+          <div className="modal-content2 animate">
+            <button style={{margin: "5px", display: "inline"}} onClick={() => ReactDOM.unmountComponentAtNode(document.getElementById("popup"))} className="closeblack"/>
+            {this.getMainContent()}
+          </div>
         </div>
       )
   }
@@ -38,45 +36,48 @@ class EditorFinalize extends Component
   {
     if(this.state.mode == "overview")
     {
-      return (<div className="logincontainer">
-      <h2 style={{color: "black"}}>
-      You're almost ready!
-      </h2>
-      <label for="conttitle"><b>Content Title</b></label>
-      <input type="text" name="conttitle" id="conttitle" size="30"/>
-      <label for="desc"><b>Content Description</b></label>
-      <textarea name="desc" id="desc" rows="4" cols="40"/>
-      {this.getPreviewImgHtml()}
-      <label><b>Prerequisite (optional)</b></label>
-      <select name="prereq" id="prereq"/>
-      <br></br>
-      <button onClick={() => this.processUpload()} className="black">Publish</button>
+      return (
+      <div className="logincontainer">
+        <h2 style={{color: "black"}}> You're almost ready! </h2>
+        <label for="conttitle"><b>Content Title</b></label>
+        <input type="text" name="conttitle" id="conttitle" size="30"/>
+        <label for="desc"><b>Content Description</b></label>
+        <textarea name="desc" id="desc" rows="4" cols="40"/>
+        {this.getPreviewImgHtml()}
+        <label><b>Prerequisite (optional)</b></label>
+        <select name="prereq" id="prereq"/>
+        <br/>
+        <button onClick={() => this.processUpload()} className="black">Publish</button>
       </div>);
     }
     else if(this.state.mode == "loading")
     {
-      return (<div className="logincontainer">
-      <img width="142" height="150" src={loadingblack}/>
+      return (
+      <div className="logincontainer">
+        <img width="142" height="150" src={loadingblack}/>
       </div>);
     }
     else if(this.state.mode == "save")
     {
-        return(<div className="logincontainer">
-      <h2 style={{color: "black"}}>Success! Your content is updated!</h2>
-      <button onClick={() => this.props.parent.props.editor_parent.props.app_parent.backToMainPage()} className="black">Back to main menu</button>
+        return(
+      <div className="logincontainer">
+        <h2 style={{color: "black"}}>Success! Your content is updated!</h2>
+        <button onClick={() => window.location.reload()} className="black">Back to main menu</button>
       </div>);
     }
     else if(this.state.mode == "error")
     {
-        return (<div className="logincontainer">
-      <div className="notification error"><p>Something went wrong...</p></div>
+        return (
+      <div className="logincontainer">
+        <div className="notification error"><p>Something went wrong...</p></div>
       </div>);
     }
     else if(this.state.mode == "success")
     {
-    return(<div className="logincontainer">
-      <h2 style={{color: "black"}}>Success! Your content is now live!</h2>
-      <button onClick={() => this.props.parent.props.editor_parent.props.app_parent.backToMainPage()} className="black">Back to main menu</button>
+    return(
+      <div className="logincontainer">
+        <h2 style={{color: "black"}}>Success! Your content is now live!</h2>
+        <button onClick={() => window.location.reload()} className="black">Back to main menu</button>
       </div>);
     }
   }
@@ -104,11 +105,11 @@ class EditorFinalize extends Component
     {
       return (
       <div>
-      <label><b>(Optional) Upload a preview image</b></label>
-      <label htmlFor="upload-file">
-      <img className="video-select" src={videoselect} width="150" height="90"/>
-      </label>
-      <input type="file" accept="image/*" id="upload-file" onInput={() => this.getRequest()}/>
+        <label><b>(Optional) Upload a preview image</b></label>
+        <label htmlFor="upload-file">
+          <img className="video-select" src={videoselect} width="150" height="90"/>
+        </label>
+        <input type="file" accept="image/*" id="upload-file" onInput={() => this.getRequest()}/>
       </div>
       )
     }
@@ -116,8 +117,8 @@ class EditorFinalize extends Component
     {
       return (
         <div>
-        <label><b>(Optional) Upload a preview image</b></label>
-        <img width="70" height="75" src={loadingblack}/>
+          <label><b>(Optional) Upload a preview image</b></label>
+          <img width="70" height="75" src={loadingblack}/>
         </div>
       )
     }
@@ -126,8 +127,8 @@ class EditorFinalize extends Component
       let prev_url = "https://interact-videos.s3.eu-central-1.amazonaws.com/previews/" + this.state.preview;
       return (
         <div>
-        <label><b>Selected preview image</b></label>
-        <img src={prev_url} width="150" height="90"/>
+          <label><b>Selected preview image</b></label>
+          <img src={prev_url} width="150" height="90"/>
         </div>
         )
     }
@@ -161,23 +162,23 @@ class EditorFinalize extends Component
   async getRequest()
   {
     let file = document.getElementById("upload-file").files[0];
-    var filetype = document.getElementById("upload-file").files[0].type;
+    let filetype = document.getElementById("upload-file").files[0].type;
     if(!filetype.includes("image"))
     {
       alert("ERROR: The selected image is not in a correct format.");
       return;
     }
     this.setState({mode: this.state.mode, vid_id: this.state.vid_id, preview: "PENDING"});
-    var id = this.makeid(10);
-    var response = await fetch("https://interact-server.herokuapp.com/upload-verify-image?file-name=" + id + "&file-type=" + filetype).then(r => r.json());
+    let id = this.makeid(10);
+    let response = await fetch("https://interact-server.herokuapp.com/upload-verify-image?file-name=" + id + "&file-type=" + filetype).then(r => r.json());
     this.uploadFile(file,response,id);
   }
 
   async uploadFile(file,requestData,id){
     if(requestData == null || requestData == "Upload failed")
     {
-      console.log("Upload aborted, signed request query failed...")
-      return;
+      alert('Could not upload file.');
+      this.setState({mode: this.state.mode, vid_id: this.state.vid_id, preview: null});
     }
     const xhr = new XMLHttpRequest();
     xhr.open('PUT', requestData.signedRequest);
