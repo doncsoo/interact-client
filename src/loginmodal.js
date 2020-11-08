@@ -71,6 +71,20 @@ class LogInModal extends Component
 
   async attemptLogIn()
   {
+    //validation
+    if(document.getElementById("uname").value == "")
+    {
+      let notification = (<div className="notification error"><p>ERROR: Username cannot be blank</p></div>);
+      ReactDOM.render(notification,document.getElementById("notifications"))
+      return;
+    }
+
+    if(document.getElementById("psw").value == "")
+    {
+      let notification = (<div className="notification error"><p>ERROR: Password cannot be blank</p></div>);
+      ReactDOM.render(notification,document.getElementById("notifications"))
+      return;
+    }
     let resp = await fetch("https://interact-server.herokuapp.com/user-verify",{
             method: 'POST',
             headers: {
@@ -95,6 +109,20 @@ class LogInModal extends Component
 
   async attemptRegister()
   {
+    //validation
+    if(document.getElementById("rname").value == "")
+    {
+      let notification = (<div className="notification error"><p>ERROR: Username cannot be blank</p></div>);
+      ReactDOM.render(notification,document.getElementById("notifications"))
+      return;
+    }
+
+    if(document.getElementById("rpsw").value == "")
+    {
+      let notification = (<div className="notification error"><p>ERROR: Password cannot be blank</p></div>);
+      ReactDOM.render(notification,document.getElementById("notifications"))
+      return;
+    }
     let status = undefined;
     let resp = await fetch("https://interact-server.herokuapp.com/register",{
             method: 'PUT',

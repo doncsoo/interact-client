@@ -22,7 +22,10 @@ class EditorContent extends Component
     if(this.props.vid_id != null)
     {
       await this.getTree();
-      this.props.editor_parent.getAlreadyPresentVideos();
+      if(this.props.editor_parent.state.videos.length == 0) {
+        console.log("fetching videos");
+        this.props.editor_parent.getAlreadyPresentVideos();
+      }
     } 
     if(this.state.tree_status.start_video != null) 
       this.setState({tree_status: this.state.tree_status, selected: "start_video", butterfly_selected: null})
@@ -35,16 +38,16 @@ class EditorContent extends Component
     console.log(tree);
     this.setState({tree_status: tree[0].tree, selected: null, butterfly_selected: null});
     this.props.editor_parent.setState({mode: this.props.editor_parent.state.mode, tree_status: tree[0].tree, 
-      videos: [], imported: []});
+      videos: this.props.editor_parent.state.videos, imported: this.props.editor_parent.state.imported});
   }
 
   render()
   {
       let savebutton = null;
       if(this.props.vid_id != null)
-      savebutton = <button style={{position: "absolute", top: "90%", left: "95%"}} onClick={() => ReactDOM.render(<EditorFinalize parent={this} editsave={true}/>,document.getElementById("popup"))} className="white">Save</button>;
+      savebutton = <button onClick={() => ReactDOM.render(<EditorFinalize parent={this} editsave={true}/>,document.getElementById("popup"))} className="white save-button"><h1 style={{color: "black", margin: "0px"}}>Save</h1></button>;
       else
-      savebutton = <button style={{position: "absolute", top: "90%", left: "95%"}} onClick={() => this.treeValidation()} className="white">Finalize</button>;
+      savebutton = <button onClick={() => this.treeValidation()} className="white save-button"><h1 style={{color: "black", margin: "0px"}}>Upload</h1></button>;
       return (
           <div>
             <button onClick={() => this.toggleNavigation()} style={{position: "absolute", top: "7%", left: "1%", zIndex: "1"}} className="white">Navigate</button>
@@ -54,7 +57,7 @@ class EditorContent extends Component
             <div className="editor-content">
               {this.getEditorByJSON()}
             </div>
-            <button style={{position: "absolute", top: "90%", left: "85%"}} onClick={() => alert(JSON.stringify(this.state.tree_status))} className="white">Show content JSON</button>
+            {/*<button style={{position: "absolute", top: "90%", left: "85%"}} onClick={() => alert(JSON.stringify(this.state.tree_status))} className="white">Show content JSON</button>*/}
             {savebutton}
             <div className="editor-videos">
               <button style={{display: "block"}} onClick={() => this.props.editor_parent.setState({mode: "upload", tree_status: this.state.tree_status, videos: this.props.editor_parent.state.videos, imported: this.props.editor_parent.state.imported})} className="white">Upload videos</button>
@@ -179,15 +182,20 @@ class EditorContent extends Component
   dropSelected(ev) {
     ev.preventDefault();
     let id = ev.dataTransfer.getData("vidid");
-    if(this.state.selected == null)
+    if(this.state.selected == null && this.state.tree_status.start_video == null)
     {
       this.generateJSON("start_video", null, {"title": "", "id": id, "event": null});
     }
-    else this.replaceSelected(this.state.selected,id);
+    else this.replaceSelected(this.state.selected != null ? this.state.selected : "start_video", id);
   }
 
   replaceSelected(old_vidid,new_vidid)
   {
+    if(this.videoPresentInTree(new_vidid))
+    {
+      alert("This video is already present in the tree. Please remove it before using it elsewhere!");
+      return;
+    }
     if(old_vidid == "start_video") this.generateJSON("start_video", null, {"title": "", "id": new_vidid, "event": null});
     else
     {
@@ -479,11 +487,11 @@ class EditorContent extends Component
       alert("This video is already present in the tree. Please remove it before using it elsewhere!");
       return;
     }
-    if(this.state.selected)
+    if(this.state.selected != null)
     {
       this.generateJSON("gateway" + which,this.state.selected, id);
       this.generateJSON("new_video", null, id);
-    } 
+    }
   }
 
   dropLinear(ev)
@@ -495,7 +503,7 @@ class EditorContent extends Component
       alert("This video is already present in the tree. Please remove it before using it elsewhere!");
       return;
     }
-    if(this.state.selected)
+    if(this.state.selected != null)
     {
       this.generateJSON("lineargateway",this.state.selected, id);
       this.generateJSON("new_video", null, id);

@@ -12,7 +12,7 @@ class Editor extends Component
     super(props);
     const base_json = {"video_title": "", "start_video": null, "videos": []};
     if(this.props.vid_id != null) this.state = {mode: "edit", tree_status: null, videos: [], imported: []};
-    else this.state = {mode: "upload", tree_status: base_json, videos: ["rRbdYDCY01"], imported: []};
+    else this.state = {mode: "upload", tree_status: base_json, videos: [], imported: []};
   }
 
   render()

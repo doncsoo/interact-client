@@ -53,7 +53,11 @@ class App extends Component
         </div>);
     }
     else if(this.state.mode == "video_play") 
-      return (<div><Player app_parent={this} vid_id={this.state.vid_id} tree={this.state.tree}/></div>)
+      return (<div><Player app_parent={this} vid_id={this.state.vid_id} tree={this.state.tree}/></div>);
+    else if(this.state.mode == "updating")
+    {
+      return (<div/>);
+    }
   }
 
   getUserMenu()
@@ -67,6 +71,16 @@ class App extends Component
           <h4 onClick={() => this.logOutFunction()} style={{cursor: "pointer", display: "block", color: "red"}}>Log out</h4>
       </div>
     );
+  }
+
+  async updateVideo(vidid)
+  {
+    let resp = await fetch("https://interact-server.herokuapp.com/get-tree/" + vidid)
+                .then(r => r.json());
+    this.setState({ mode: "updating", vid_id: null, tree: null, user: this.state.user }, 
+    function() {
+      setTimeout(() => { this.setState({ mode: "video_play", vid_id: vidid, tree: resp[0].tree, user: this.state.user }) },100)
+      });
   }
 
   getMainContent()

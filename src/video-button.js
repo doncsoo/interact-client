@@ -18,20 +18,24 @@ class VideoButton extends Component
                 <label style={{paddingBottom: "5px", paddingLeft: "5px", fontSize: "11px"}}>{this.props.description.substring(0,100)}</label>
               </div>
             </div>
-            {this.renderEditorButtons()}
+            {this.renderEditorExtras()}
           </div>
       );
   }
 
-  renderEditorButtons()
+  renderEditorExtras()
   {
-    let editor_buttons = [];
     if(this.props.enableEditorOptions)
     {
-      editor_buttons.push(<button onClick={() => this.props.editVideo(this.props.vid_id)} className="black">Edit</button>);
-      editor_buttons.push(<button onClick={() => this.deleteVideo()} className="black">Delete</button>);
+      return (
+        <div>
+          <label style={{display: "inline"}}> <b>Likes:</b> {this.props.likes}</label>
+          <button onClick={() => this.props.editVideo(this.props.vid_id)} className="black">Edit</button>
+          <button onClick={() => this.deleteVideo()} className="black">Delete</button>
+        </div>
+      );
     }
-    return editor_buttons;
+    else return null;
   }
 
   fetchPreview()

@@ -56,7 +56,7 @@ class Player extends Component
             <h2>This content requires prerequisite.</h2>
             <h4 style={{color: "white"}}>Please log in and complete the following content first.</h4>
             <div id="prereq">
-            <img width="75" height="78" id="prereq_loading" src={loadinggif}/>
+                <img width="75" height="78" id="prereq_loading" src={loadinggif}/>
             </div>
             <br></br>
             <button className="white" onClick={() => this.props.app_parent.setState({ mode: "browse_main", vid_id: null, tree: null, user: this.props.app_parent.state.user })}>Return to main page</button>
@@ -110,8 +110,8 @@ class Player extends Component
     {
         let cookies = Cookie.parse(document.cookie);
         let resp = undefined;
-        //if(cookies.session_user && cookies.session_token)
-        //{
+        if(cookies.session_user && cookies.session_token)
+        {
             resp = await fetch("https://interact-server.herokuapp.com/prereq-choices",{
                 method: 'POST',
                 headers: {
@@ -121,8 +121,8 @@ class Player extends Component
                        token: cookies.session_token,
                        vidid: prereq_id}),
             }).then(r => r.json());
-        //}
-        //else resp = [];
+        }
+        else resp = [];
         console.log(resp);
         if(resp.length == 0)
         {
@@ -326,7 +326,7 @@ class Player extends Component
             {
                 this.changeCurrentVideo(vidobj.event.gateway[j],null);
                 document.getElementById("butterflylogo").className = "butterflylogo shown";
-                setTimeout(() => document.getElementById("butterflylogo").className = "butterflylogo hidden",5000);
+                setTimeout(() => { if(document.getElementById("butterflylogo") != null) document.getElementById("butterflylogo").className = "butterflylogo hidden"; },5000);
                 return;
             }
         }
@@ -426,12 +426,13 @@ class Player extends Component
 
         let prereq_prev = "https://interact-videos.s3.eu-central-1.amazonaws.com/previews/" + prereq[0].preview_id;
 
-        ReactDOM.render(<div style={{cursor: "pointer"}} id="video-button">
-        <img src={prereq_prev} id="prereqpreview" width="200px" height="120px"></img>
-        <div>
-        <label style={{color:"white", cursor: "pointer"}} style={{paddingBottom: "5px", paddingLeft: "5px", fontSize: "20px"}}><b style={{color: "white"}}>{prereq[0].name}</b></label>
-        <label style={{color:"white", paddingBottom: "5px", paddingLeft: "5px", fontSize: "11px"}}>{prereq[0].description.substring(0,100)}</label>
-        </div>
+        ReactDOM.render(
+        <div onClick={() => this.props.app_parent.updateVideo(resp[0].prerequisite)} style={{cursor: "pointer"}} id="video-button">
+            <img src={prereq_prev} id="prereqpreview" width="200px" height="120px"></img>
+            <div>
+                <label style={{color:"white", cursor: "pointer"}} style={{paddingBottom: "5px", paddingLeft: "5px", fontSize: "20px"}}><b style={{color: "white"}}>{prereq[0].name}</b></label>
+                <label style={{color:"white", paddingBottom: "5px", paddingLeft: "5px", fontSize: "11px"}}>{prereq[0].description.substring(0,100)}</label>
+            </div>
         </div>,document.getElementById("prereq"));
     }
 

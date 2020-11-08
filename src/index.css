@@ -588,7 +588,7 @@ color: white;
 
 .editor-navigation {
   position: absolute;
-  width: 18%;
+  width: 22%;
   height: 60%;
   background-color: white;
   border: 2px solid white;
@@ -620,6 +620,13 @@ color: white;
   left: 50%;
   top: 50%;
   transform: translate(-50%,-50%);
+}
+
+.save-button {
+  position: absolute;
+  top: 80%;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .empty-video:before, .empty-video-left:before, .empty-video-right:before, .empty-video-linear:before {
