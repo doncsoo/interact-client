@@ -18,7 +18,7 @@ class Player extends Component
         <div id="video-comp" className="c-video">
         <div id="header">
         <button className="close" onClick={() => this.props.app_parent.setState({ mode: "browse_main", vid_id: null, tree: null, user: this.props.app_parent.state.user })}/>
-        <h2 style={{marginBottom: "1px"}}>{!this.state.tree ? null : this.state.tree.video_title}</h2>
+        <h2 id="title" style={{marginBottom: "1px"}}>{!this.state.tree ? null : this.state.tree.video_title}</h2>
         <button id="like-button" title={this.props.app_parent.user != null ? "Log in to use this functionality" : ""} onClick={() => this.processLike()} style={{display: "inline", paddingRight: "10px"}} className="like"/>
         <h3 id="like-indicator" style={{display: "inline"}}>-</h3>
         </div>

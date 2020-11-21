@@ -38,11 +38,11 @@ class LogInModal extends Component
           <label for="psw"><b>Password</b></label>
           <input type="password" placeholder="Enter Password" name="psw" id="psw" required/>
           <br/>
-          <button onClick={() => this.attemptLogIn()} type="submit" className="black">Login</button>
+          <button onClick={() => this.attemptLogIn()} id="loginbutton" className="black">Login</button>
           <br/>
         </div>
         <div className="logincontainer" style={{backgroundColor:"#f1f1f1"}}>
-          <button onClick={() => this.setState({mode: "register"})} className="black">Register</button>
+          <button onClick={() => this.setState({mode: "register"})} id="switchregisterbutton" className="black">Register</button>
         </div>
       </div>);
     }
@@ -60,10 +60,10 @@ class LogInModal extends Component
           <label for="fname"><b>Full Name</b></label>
           <input type="text" placeholder="Enter Fullname" name="fname" id="fname" required/>
           <br/>
-          <button className="black" onClick={() => this.attemptRegister()} type="submit">Register</button>
+          <button className="black" onClick={() => this.attemptRegister()} id="registerbutton" type="submit">Register</button>
         </div>
         <div className="logincontainer" style={{backgroundColor:"#f1f1f1"}}>
-          <button onClick={() => this.setState({mode: "login"})} className="black">Login</button>
+          <button onClick={() => this.setState({mode: "login"})} id="switchloginbutton" className="black">Login</button>
         </div>
       </div>);
     }
