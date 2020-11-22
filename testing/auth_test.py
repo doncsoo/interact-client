@@ -34,7 +34,7 @@ class AuthTest(unittest.TestCase):
 
     def test_1_register(self):
         driver = self.driver
-        driver.get('localhost:3000')
+        driver.get(frontend_address)
         driver.implicitly_wait(1)
 
         auth_button = driver.find_element_by_class_name('log-in')
@@ -62,7 +62,7 @@ class AuthTest(unittest.TestCase):
 
     def test_2_login(self):
         driver = self.driver
-        driver.get('localhost:3000')
+        driver.get(frontend_address)
         driver.implicitly_wait(1)
 
         self.login_function()
@@ -72,7 +72,7 @@ class AuthTest(unittest.TestCase):
     
     def test_3_test_like(self):
         driver = self.driver
-        driver.get('localhost:3000')
+        driver.get(frontend_address)
         driver.implicitly_wait(3)
 
         self.login_function()
@@ -106,7 +106,7 @@ class AuthTest(unittest.TestCase):
 
     def test_4_test_dislike(self):
         driver = self.driver
-        driver.get('localhost:3000')
+        driver.get(frontend_address)
         driver.implicitly_wait(3)
 
         self.login_function()
@@ -137,7 +137,7 @@ class AuthTest(unittest.TestCase):
     
     def test_5_prereq(self):
         driver = self.driver
-        driver.get('localhost:3000')
+        driver.get(frontend_address)
         driver.implicitly_wait(3)
 
         self.login_function()
@@ -183,6 +183,7 @@ def get_random_string(length):
 username = get_random_string(8)
 password = get_random_string(8)
 fullname = "TEST ACCOUNT"
+frontend_address = 'http://interact-client.herokuapp.com'
 
 if __name__ == "__main__": 
     unittest.main() 

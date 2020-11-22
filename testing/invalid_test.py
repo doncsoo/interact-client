@@ -13,10 +13,10 @@ class InvalidTest(unittest.TestCase):
         #self.driver = webdriver.Chrome("chromedriver.exe")
         #firefox preferred for ui testing
         self.driver = webdriver.Firefox(executable_path="geckodriver.exe")
-    
+
     def test_login_no_input(self):
         driver = self.driver
-        driver.get("localhost:3000")
+        driver.get(frontend_address)
         driver.implicitly_wait(2)
 
         auth_button = driver.find_element_by_class_name('log-in')
@@ -31,7 +31,7 @@ class InvalidTest(unittest.TestCase):
 
     def test_login_invalid_password(self):
         driver = self.driver
-        driver.get("localhost:3000")
+        driver.get(frontend_address)
         driver.implicitly_wait(2)
 
         auth_button = driver.find_element_by_class_name('log-in')
@@ -57,7 +57,7 @@ class InvalidTest(unittest.TestCase):
     
     def test_register_no_input(self):
         driver = self.driver
-        driver.get("localhost:3000")
+        driver.get(frontend_address)
 
         driver.implicitly_wait(1)
 
@@ -77,7 +77,7 @@ class InvalidTest(unittest.TestCase):
 
     def test_register_existing_user(self):
         driver = self.driver
-        driver.get("localhost:3000")
+        driver.get(frontend_address)
 
         driver.implicitly_wait(2)
 
@@ -125,11 +125,11 @@ class InvalidTest(unittest.TestCase):
 
     def test_content_listing(self):
         driver = self.driver
-        driver.get("http://interact-server.herokuapp.com/get-videos/all")
+        driver.get(backend_address + '/get-videos/all')
 
         json_response = self.return_json_resp()
 
-        driver.get("localhost:3000")
+        driver.get(frontend_address)
         driver.implicitly_wait(3)
         video_buttons_titles = driver.find_elements_by_xpath("//div[@id='video-button']/div[@id='attributes']/label[1]/b")
         video_buttons_owner = driver.find_elements_by_xpath("//div[@id='video-button']/div[@id='attributes']/label[2]")
@@ -144,14 +144,11 @@ class InvalidTest(unittest.TestCase):
             owner_from_document = video_buttons_owner[i].get_attribute('innerHTML')
             self.assertEqual(json_owner, owner_from_document.replace("<b>By:</b>","").lstrip())
 
-    def test_base(self):
-        driver = self.driver
-        driver.get("http://interact-client.herokuapp.com/")
-
-        self.assertIn("Interact", driver.title)
-
     def tearDown(self): 
         self.driver.close() 
+
+frontend_address = 'http://interact-client.herokuapp.com'
+backend_address = 'http://interact-server.herokuapp.com'
 
 if __name__ == "__main__": 
     unittest.main() 
