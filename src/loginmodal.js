@@ -95,9 +95,11 @@ class LogInModal extends Component
         })
         .then(r => r.json());
     if(resp.verified == true){
-      this.props.app_parent.setUser(document.getElementById("uname").value);
+      console.log(resp);
+      this.props.app_parent.setUser(document.getElementById("uname").value, resp.isadmin);
       document.cookie = "session_user=" + document.getElementById("uname").value;
-      document.cookie = "session_token=" + resp.token;    
+      document.cookie = "session_token=" + resp.token;
+      document.cookie = "session_isadmin=" + resp.isadmin;
       ReactDOM.unmountComponentAtNode(document.getElementById("login-modal-div"));
     }
     else
@@ -124,7 +126,7 @@ class LogInModal extends Component
       return;
     }
     let status = undefined;
-    let resp = await fetch("https://interact-server.herokuapp.com/register",{
+    let resp = await fetch("https://interact-server.herokuapp.com/user",{
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json'

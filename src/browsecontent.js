@@ -93,7 +93,8 @@ class BrowseContent extends Component
     let entries = []
     for(var i = 0 ; i < resp.length; i++)
     {
-      entries.push(<VideoButton enableEditorOptions={this.props.mode == "uploads"} tree={resp[i].tree} vid_id={resp[i].id} likes={resp[i].likes} initPlayer={(tree,id) => this.props.app_parent.initPlayer(tree,id)} editVideo={(id) => this.props.app_parent.editVideo(id)} title={resp[i].name} creator={resp[i].owner} upload_date={resp[i].upload_date} description={resp[i].description} preview_id={resp[i].preview_id}/>)
+      let enableEditor = this.props.mode == "uploads";
+      entries.push(<VideoButton enableEditorOptions={enableEditor} tree={resp[i].tree} vid_id={resp[i].id} likes={resp[i].likes} initPlayer={(tree,id) => this.props.app_parent.initPlayer(tree,id)} editVideo={(id) => this.props.app_parent.editVideo(id)} title={resp[i].name} creator={resp[i].owner} upload_date={resp[i].upload_date} description={resp[i].description} preview_id={resp[i].preview_id}/>)
     }
     if(this.props.mode == "uploads" && entries.length == 0)
     {

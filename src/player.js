@@ -10,7 +10,18 @@ class Player extends Component
 
     async componentDidMount()
     {
-       this.preLaunchFunction();
+       try
+       {
+            this.preLaunchFunction();
+       }
+       catch(error) {
+           this.globalError();
+       }
+    }
+
+    componentDidCatch(error,info)
+    {
+        this.globalError();
     }
 
     render() {
@@ -41,7 +52,7 @@ class Player extends Component
                     <h3 className="subtitle">{this.state.tree ? this.getCurrentTitle() : null}</h3>
                 </div>
             </div>
-            </div>
+        </div>
         </div>
         <div style={{display: "none"}} id="end-title">
             <h2>The content has ended.</h2>
@@ -229,7 +240,7 @@ class Player extends Component
         ReactDOM.unmountComponentAtNode(document.getElementById("inner-choices"))
         if(this.findVideoPathObject(vidid).event) this.setState({tree : this.state.tree, current_video: vidid, final: false, choices: new_choices, time_when_choice: null, liked: this.state.liked})
         else this.setState({tree : this.state.tree, current_video: vidid, final: true, choices: new_choices, time_when_choice: null, liked: this.state.liked})
-        this.handleEvent(vidid)
+        this.handleEvent(vidid);
         this.toggleController(true);
     }
 
@@ -373,7 +384,7 @@ class Player extends Component
         {
             if(this.state.current_video == "start")
             {
-               return "https://interact-videos.s3.eu-central-1.amazonaws.com/" + this.state.tree.start_video.id;
+                return "https://interact-videos.s3.eu-central-1.amazonaws.com/" + this.state.tree.start_video.id;
             }
             else return "https://interact-videos.s3.eu-central-1.amazonaws.com/" + this.state.current_video;
         }

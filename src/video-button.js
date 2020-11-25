@@ -15,7 +15,7 @@ class VideoButton extends Component
                 <label style={{cursor: "pointer"}} style={{paddingBottom: "5px", paddingLeft: "5px", fontSize: "20px"}}><b>{this.props.title}</b></label>
                 <label style={{paddingBottom: "5px", paddingLeft: "5px"}}> <b>By:</b> {this.props.creator}</label>
                 <label style={{paddingBottom: "5px", paddingLeft: "5px"}}> <b>Uploaded:</b> {this.props.upload_date.substring(0,10)}</label>
-                <label style={{paddingBottom: "5px", paddingLeft: "5px", fontSize: "11px"}}>{this.props.description.substring(0,100)}</label>
+                <label style={{paddingBottom: "5px", paddingLeft: "5px", fontSize: "11px"}}>{!this.props.description ? "" : this.props.description.substring(0,100)}</label>
               </div>
             </div>
             {this.renderEditorExtras()}
@@ -49,6 +49,7 @@ class VideoButton extends Component
     let confirm_res = window.confirm("Are you want to delete this content?");
     if(confirm_res == true)
     {
+      let status = undefined;
       let cookies = Cookie.parse(document.cookie);
       let resp = await fetch("https://interact-server.herokuapp.com/content",{
           method: 'DELETE',
@@ -59,9 +60,12 @@ class VideoButton extends Component
                   token: cookies.session_token,
                   id: this.props.vid_id}),
       })
-      .then(r => r.text());
+      .then(function(r) {
+        status = r.status; 
+        return r.text()
+      });
 
-      if(resp == "OK")
+      if(status == 200)
       {
           alert("The content was deleted.");
           window.location.reload()
