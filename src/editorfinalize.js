@@ -17,15 +17,16 @@ class EditorFinalize extends Component
 
   async componentDidMount()
   {
-    this.renderAllVideosList();
+    if(document.getElementById("prereq")) this.renderAllVideosList();
   }
 
   render()
   {
+    let exitbutton = <button style={{margin: "5px", display: "inline"}} onClick={() => ReactDOM.unmountComponentAtNode(document.getElementById("popup"))} id="closefinalize" className="closeblack"/>;
       return (
         <div className="modal">
           <div className="modal-content2 animate">
-            <button style={{margin: "5px", display: "inline"}} onClick={() => ReactDOM.unmountComponentAtNode(document.getElementById("popup"))} className="closeblack"/>
+            {this.state.mode == "overview" || this.state.mode == "error" ? exitbutton : null}
             {this.getMainContent()}
           </div>
         </div>
@@ -70,6 +71,7 @@ class EditorFinalize extends Component
         return (
       <div className="logincontainer">
         <div className="notification error"><p>Something went wrong...</p></div>
+        <button onClick={() => window.location.reload()} className="black">Back to main menu</button>
       </div>);
     }
     else if(this.state.mode == "success")
@@ -95,6 +97,7 @@ class EditorFinalize extends Component
     {
       list.push(<option value={vid.id}>{vid.name}</option>);
     }
+
 
     ReactDOM.render(list,document.getElementById("prereq"));
   }

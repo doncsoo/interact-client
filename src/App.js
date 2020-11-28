@@ -50,7 +50,7 @@ class App extends Component
         </div>);
     }
     else if(this.state.mode == "video_play") 
-      return (<div><ErrorBoundary><Player app_parent={this} vid_id={this.state.vid_id} tree={this.state.tree}/></ErrorBoundary></div>);
+      return (<div><Player app_parent={this} vid_id={this.state.vid_id} tree={this.state.tree}/></div>);
     else if(this.state.mode == "updating")
     {
       return (<div/>);

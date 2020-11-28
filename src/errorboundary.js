@@ -17,7 +17,7 @@ class ErrorBoundary extends Component {
         return (<div className="container" id="video1">
                     <div id="error-screen">
                         <h2>An error occurred.</h2>
-                        <h3>Please try again later.</h3>
+                        <h3>Please check your connection or try again later.</h3>
                         <button className="white" onClick={() => window.location.reload()}>Return to main page</button>
                     </div>
                 </div>);

@@ -182,6 +182,16 @@ class EditorContent extends Component
   dropSelected(ev) {
     ev.preventDefault();
     let id = ev.dataTransfer.getData("vidid");
+    if(this.videoPresentInTree(id))
+    {
+      alert("This video is already present in the tree. Please remove it before using it elsewhere!");
+      return;
+    }
+    if(!id)
+    {
+      alert("Invalid drag-drop. Please only use the videos in the lower left corner.");
+      return;
+    }
     if(this.state.selected == null && this.state.tree_status.start_video == null)
     {
       this.generateJSON("start_video", null, {"title": "", "id": id, "event": null});
@@ -466,6 +476,7 @@ class EditorContent extends Component
         <button style={{border: "none", background: "none"}} onClick={(ev) => this.setState({tree_status: this.state.tree_status, selected: "start_video", butterfly_selected: null})}><div style={{display: "flex"}}><img style={{borderRadius: "5px"}} width='139' height='80' src={start_url}/><h3 style={{color: "black", paddingLeft: "5px"}}>{this.state.tree_status.start_video.title ?? "<no title>"}</h3><label>START</label></div></button>);
       for(let video of this.state.tree_status.videos)
       {
+        navigation_buttons.push(<br/>);
         let url = "http://interact-server.herokuapp.com/get-preview/" + video.id;
         navigation_buttons.push(
           <button style={{border: "none", background: "none"}} onClick={(ev) => this.setState({tree_status: this.state.tree_status, selected: video.id, butterfly_selected: null})}><div style={{display: "flex"}}><img style={{borderRadius: "5px"}} width='139' height='80' src={url}/><h3 style={{color: "black", paddingLeft: "5px"}}>{video.title ?? "<no title>"}</h3></div></button>);
@@ -487,6 +498,11 @@ class EditorContent extends Component
       alert("This video is already present in the tree. Please remove it before using it elsewhere!");
       return;
     }
+    if(!id)
+    {
+      alert("Invalid drag-drop. Please only use the videos in the lower left corner.");
+      return;
+    }
     if(this.state.selected != null)
     {
       this.generateJSON("gateway" + which,this.state.selected, id);
@@ -503,6 +519,11 @@ class EditorContent extends Component
       alert("This video is already present in the tree. Please remove it before using it elsewhere!");
       return;
     }
+    if(!id)
+    {
+      alert("Invalid drag-drop. Please only use the videos in the lower left corner.");
+      return;
+    }
     if(this.state.selected != null)
     {
       this.generateJSON("lineargateway",this.state.selected, id);
@@ -517,6 +538,11 @@ class EditorContent extends Component
     if(this.videoPresentInTree(id))
     {
       alert("This video is already present in the tree. Please remove it before using it elsewhere!");
+      return;
+    }
+    if(!id)
+    {
+      alert("Invalid drag-drop. Please only use the videos in the lower left corner.");
       return;
     }
     if(this.state.selected)
@@ -604,7 +630,10 @@ class EditorContent extends Component
   videoPresentInTree(id)
   {
     let json = this.state.tree_status;
-    if(json.start_video.id == id) return true;
+    if(json.start_video)
+    {
+      if(json.start_video.id == id) return true;
+    }
     else
     {
       for(let video of json.videos)
@@ -622,18 +651,22 @@ class EditorContent extends Component
 
   validation_validGateways(event)
   {
-    if(event.type == "choice")
+    if(event)
     {
-      return event.gateway.one != null && event.gateway.two != null;
+      if(event.type == "choice")
+      {
+        return event.gateway.one != null && event.gateway.two != null;
+      }
+      else if(event.type == "butterfly")
+      {
+        return event.gateway != [] && event.required_choices.length == event.gateway.length;
+      }
+      else if(event.type == "linear")
+      {
+        return event.gateway != null;
+      }
     }
-    else if(event.type == "butterfly")
-    {
-      return event.gateway != [] && event.required_choices.length == event.gateway.length;
-    }
-    else if(event.type == "linear")
-    {
-      return event.gateway != null;
-    }
+    else return true;
   }
 
   treeValidation()

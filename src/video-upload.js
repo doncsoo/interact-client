@@ -20,7 +20,7 @@ class VideoUpload extends Component
         {this.props.editor_parent.getVideoPreviews()}
         </div>
         <div id="upload_queue"/>
-        <button onClick={() => this.props.editor_parent.setState({mode: "edit"})} className="white">Next</button>
+        <button onClick={() => this.props.editor_parent.setState({mode: "edit"})} id="uploadnext" className="white">Next</button>
         </div>
       )
   }
@@ -36,6 +36,7 @@ class VideoUpload extends Component
   
   async getRequest()
   {
+    document.getElementById("uploadnext").style.display = "none";
     var filetype = document.getElementById("upload-file").files[0].type;
     if(filetype != "video/mp4")
     {
@@ -61,14 +62,16 @@ async uploadFile(file,requestData,id){
   xhr.onreadystatechange = async () => {
     if(xhr.readyState === 4){
       if(xhr.status === 200){
-        alert('File successfully uploaded');
         ReactDOM.unmountComponentAtNode(document.getElementById("upload_queue"));
         let temp_videos = this.props.editor_parent.state.videos;
         temp_videos.push(id);
         this.props.editor_parent.setState({mode: "upload", videos: temp_videos});
         document.getElementById("upload-file").disabled = false;
+        document.getElementById("uploadnext").style.display = "block";
+        alert('File successfully uploaded');
       }
       else{
+        document.getElementById("uploadnext").style.display = "block";
         alert('Could not upload file.');
       }
     }
