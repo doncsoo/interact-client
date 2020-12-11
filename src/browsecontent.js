@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import VideoButton from './video-button';
 import loadingblack from './loadingblack.gif';
+import { backend } from './App';
 
 class BrowseContent extends Component
 {
@@ -88,7 +89,7 @@ class BrowseContent extends Component
 
   async queryVideos(user)
   {
-    let resp = await fetch("https://interact-server.herokuapp.com/get-videos/" + user, {cache: "no-store"})
+    let resp = await fetch(backend + "/get-videos/" + user, {cache: "no-store"})
           .then(r => r.json());
     let entries = []
     for(var i = 0 ; i < resp.length; i++)
@@ -105,13 +106,13 @@ class BrowseContent extends Component
 
   async queryFavorites()
   {
-    let fav = await fetch("https://interact-server.herokuapp.com/get-fav-videos/" + this.props.app_parent.state.user)
+    let fav = await fetch(backend + "/get-fav-videos/" + this.props.app_parent.state.user)
           .then(r => r.json());
     fav = fav[0].likes;
     let entries = []
     for(var i = 0 ; i < fav.length; i++)
     {
-      let resp = await fetch("https://interact-server.herokuapp.com/get-video/" + fav[i])
+      let resp = await fetch(backend + "/get-video/" + fav[i])
                         .then(r => r.json());
       entries.push(<VideoButton tree={resp[0].tree} vid_id={resp[0].id} likes={resp[0].likes} initPlayer={(tree,id) => this.props.app_parent.initPlayer(tree,id)} title={resp[0].name} creator={resp[0].owner} upload_date={resp[0].upload_date} description={resp[0].description} preview_id={resp[0].preview_id}/>)
     }
@@ -124,7 +125,7 @@ class BrowseContent extends Component
 
   async querySearch()
   {
-    let resp = await fetch("https://interact-server.herokuapp.com/search-query/" + this.state.search_term, {cache: "no-store"})
+    let resp = await fetch(backend + "/search-query/" + this.state.search_term, {cache: "no-store"})
           .then(r => r.json());
     let entries = []
     for(var i = 0 ; i < resp.length; i++)

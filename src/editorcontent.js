@@ -4,6 +4,7 @@ import EditorFinalize from './editorfinalize';
 import Cookie from 'cookie';
 import loadinggif from './loadingblack.gif';
 import butterfly from './butterflywhite.png';
+import { backend } from './App';
 
 class EditorContent extends Component
 {
@@ -41,6 +42,11 @@ class EditorContent extends Component
       videos: this.props.editor_parent.state.videos, imported: this.props.editor_parent.state.imported});
   }
 
+  dragStart(ev)
+  {
+    ev.dataTransfer.setData("vidid", ev.target.getAttribute("vidid"));
+  }
+
   render()
   {
       let savebutton = null;
@@ -75,7 +81,7 @@ class EditorContent extends Component
     let list = [];
     list.push(<option value="none">None (default)</option>);
     let cookies = Cookie.parse(document.cookie)
-    let resp = await fetch("https://interact-server.herokuapp.com/get-videos/" + cookies.session_user, {cache: "no-store"})
+    let resp = await fetch(backend + "/get-videos/" + cookies.session_user, {cache: "no-store"})
         .then(r => r.json());
     for(let vid of resp)
     {
@@ -182,11 +188,6 @@ class EditorContent extends Component
   dropSelected(ev) {
     ev.preventDefault();
     let id = ev.dataTransfer.getData("vidid");
-    if(this.videoPresentInTree(id))
-    {
-      alert("This video is already present in the tree. Please remove it before using it elsewhere!");
-      return;
-    }
     if(!id)
     {
       alert("Invalid drag-drop. Please only use the videos in the lower left corner.");
@@ -473,13 +474,13 @@ class EditorContent extends Component
     {
       let start_url = "http://interact-server.herokuapp.com/get-preview/" + this.state.tree_status.start_video.id;
       navigation_buttons.push(
-        <button style={{border: "none", background: "none"}} onClick={(ev) => this.setState({tree_status: this.state.tree_status, selected: "start_video", butterfly_selected: null})}><div style={{display: "flex"}}><img style={{borderRadius: "5px"}} width='139' height='80' src={start_url}/><h3 style={{color: "black", paddingLeft: "5px"}}>{this.state.tree_status.start_video.title ?? "<no title>"}</h3><label>START</label></div></button>);
+        <button style={{border: "none", background: "none"}} onClick={(ev) => this.setState({tree_status: this.state.tree_status, selected: "start_video", butterfly_selected: null})}><div style={{display: "flex"}}><img style={{borderRadius: "5px"}} vidid={this.state.tree_status.start_video.id} onDragStart={(ev) => this.dragStart(ev)} draggable="true" width='139' height='80' src={start_url}/><h3 style={{color: "black", paddingLeft: "5px"}}>{this.state.tree_status.start_video.title ?? "<no title>"}</h3><label>START</label></div></button>);
       for(let video of this.state.tree_status.videos)
       {
         navigation_buttons.push(<br/>);
         let url = "http://interact-server.herokuapp.com/get-preview/" + video.id;
         navigation_buttons.push(
-          <button style={{border: "none", background: "none"}} onClick={(ev) => this.setState({tree_status: this.state.tree_status, selected: video.id, butterfly_selected: null})}><div style={{display: "flex"}}><img style={{borderRadius: "5px"}} width='139' height='80' src={url}/><h3 style={{color: "black", paddingLeft: "5px"}}>{video.title ?? "<no title>"}</h3></div></button>);
+          <button style={{border: "none", background: "none"}} onClick={(ev) => this.setState({tree_status: this.state.tree_status, selected: video.id, butterfly_selected: null})}><div style={{display: "flex"}}><img style={{borderRadius: "5px"}} vidid={video.id} onDragStart={(ev) => this.dragStart(ev)} draggable="true" width='139' height='80' src={url}/><h3 style={{color: "black", paddingLeft: "5px"}}>{video.title ?? "<no title>"}</h3></div></button>);
       }
       return navigation_buttons;
     }
@@ -493,11 +494,6 @@ class EditorContent extends Component
   {
     ev.preventDefault();
     let id = ev.dataTransfer.getData("vidid");
-    if(this.videoPresentInTree(id))
-    {
-      alert("This video is already present in the tree. Please remove it before using it elsewhere!");
-      return;
-    }
     if(!id)
     {
       alert("Invalid drag-drop. Please only use the videos in the lower left corner.");
@@ -506,7 +502,7 @@ class EditorContent extends Component
     if(this.state.selected != null)
     {
       this.generateJSON("gateway" + which,this.state.selected, id);
-      this.generateJSON("new_video", null, id);
+      if(!this.videoPresentInTree(id)) this.generateJSON("new_video", null, id);
     }
   }
 
@@ -514,11 +510,6 @@ class EditorContent extends Component
   {
     ev.preventDefault();
     let id = ev.dataTransfer.getData("vidid");
-    if(this.videoPresentInTree(id))
-    {
-      alert("This video is already present in the tree. Please remove it before using it elsewhere!");
-      return;
-    }
     if(!id)
     {
       alert("Invalid drag-drop. Please only use the videos in the lower left corner.");
@@ -527,7 +518,7 @@ class EditorContent extends Component
     if(this.state.selected != null)
     {
       this.generateJSON("lineargateway",this.state.selected, id);
-      this.generateJSON("new_video", null, id);
+      if(!this.videoPresentInTree(id)) this.generateJSON("new_video", null, id);
     }
   }
 
@@ -535,11 +526,6 @@ class EditorContent extends Component
   {
     ev.preventDefault();
     let id = ev.dataTransfer.getData("vidid");
-    if(this.videoPresentInTree(id))
-    {
-      alert("This video is already present in the tree. Please remove it before using it elsewhere!");
-      return;
-    }
     if(!id)
     {
       alert("Invalid drag-drop. Please only use the videos in the lower left corner.");
@@ -548,7 +534,7 @@ class EditorContent extends Component
     if(this.state.selected)
     {
       this.generateJSON("butterfly",this.state.selected, [this.state.butterfly_selected,id]);
-      this.generateJSON("new_video", null, id);
+      if(!this.videoPresentInTree(id)) this.generateJSON("new_video", null, id);
     }
   }
 
@@ -629,19 +615,16 @@ class EditorContent extends Component
 
   videoPresentInTree(id)
   {
-    let json = this.state.tree_status;
-    if(json.start_video)
+    if(this.state.tree_status.start_video)
     {
-      if(json.start_video.id == id) return true;
-    }
-    else
-    {
-      for(let video of json.videos)
+      if(this.state.tree_status.start_video.id == id) return true;
+      for(let video of this.state.tree_status.videos)
       {
         if(video.id == id) return true;
       }
       return false;
     }
+    else return false;
   }
 
   selectVideo(id)
@@ -706,7 +689,7 @@ class EditorContent extends Component
     let json = this.state.tree_status;
     json.video_title = title;
     let cookies = Cookie.parse(document.cookie);
-    let resp = await fetch("https://interact-server.herokuapp.com/content",{
+    let resp = await fetch(backend + "/content",{
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json'
@@ -726,7 +709,7 @@ class EditorContent extends Component
   async saveContent()
   {
     let cookies = Cookie.parse(document.cookie);
-    let resp = await fetch("https://interact-server.herokuapp.com/content",{
+    let resp = await fetch(backend + "/content",{
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'

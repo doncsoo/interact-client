@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import Cookie from 'cookie';
 import VideoButton from './video-button';
+import { backend } from './App';
 
 class Manager extends Component
 {
@@ -31,7 +32,7 @@ class Manager extends Component
 
     async search(val)
     {
-    let resp = await fetch("https://interact-server.herokuapp.com/search-query/" + val, {cache: "no-store"})
+    let resp = await fetch(backend + "/search-query/" + val, {cache: "no-store"})
             .then(r => r.json());
     let entries = []
     for(var i = 0 ; i < resp.length; i++)
@@ -52,6 +53,11 @@ class Manager extends Component
             alert("Please supply a username.");
             return;
         }
+        else if(document.getElementById("deluname").value == this.props.app_parent.state.user)
+        {
+            alert("You cannot delete yourself.");
+            return;
+        }
         let confirm_res = window.confirm("Are you sure you want to delete the following user?");
         if(confirm_res == true)
         {
@@ -59,7 +65,7 @@ class Manager extends Component
             let status = undefined;
             console.log(document.getElementById("deluname").value);
             console.log(cookies.session_token);
-            let resp = await fetch("https://interact-server.herokuapp.com/user",{
+            let resp = await fetch(backend + "/user",{
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json'

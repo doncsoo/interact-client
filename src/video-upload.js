@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import loadinggif from './loading.gif';
 import videoselect from './videoselect.png';
+import { backend } from './App';
 
 class VideoUpload extends Component
 {
@@ -36,24 +37,27 @@ class VideoUpload extends Component
   
   async getRequest()
   {
-    document.getElementById("uploadnext").style.display = "none";
-    var filetype = document.getElementById("upload-file").files[0].type;
-    if(filetype != "video/mp4")
+    if(document.getElementById("upload-file").files[0])
     {
-      alert("ERROR: The selected file is not in a correct format.");
-      return;
+      document.getElementById("uploadnext").style.display = "none";
+      var filetype = document.getElementById("upload-file").files[0].type;
+      if(filetype != "video/mp4")
+      {
+        alert("ERROR: The selected file is not in a correct format.");
+        return;
+      }
+      ReactDOM.render(<div><img src={loadinggif} width="32" height="32"/><label style={{color: "white", display: "inline"}}>Uploading {document.getElementById("upload-file").files[0].name}</label></div>,document.getElementById("upload_queue"))
+      var id = this.makeid(10);
+      var response = await fetch(backend + "/upload-verify?file-name=" + id + "&file-type=" + filetype).then(r => r.json());
+      document.getElementById("upload-file").disabled = true;
+      this.uploadFile(document.getElementById("upload-file").files[0],response,id)
     }
-    ReactDOM.render(<div><img src={loadinggif} width="32" height="32"/><label style={{color: "white", display: "inline"}}>Uploading {document.getElementById("upload-file").files[0].name}</label></div>,document.getElementById("upload_queue"))
-    var id = this.makeid(10);
-    var response = await fetch("https://interact-server.herokuapp.com/upload-verify?file-name=" + id + "&file-type=" + filetype).then(r => r.json());
-    document.getElementById("upload-file").disabled = true;
-    this.uploadFile(document.getElementById("upload-file").files[0],response,id)
   }
 
 async uploadFile(file,requestData,id){
   if(requestData == null || requestData == "Upload failed")
   {
-    console.log("Upload aborted, signed request query failed...")
+    alert("Upload aborted, signed request query failed...")
     return;
   }
   const xhr = new XMLHttpRequest();
@@ -72,7 +76,7 @@ async uploadFile(file,requestData,id){
       }
       else{
         document.getElementById("uploadnext").style.display = "block";
-        alert('Could not upload file.');
+        alert('Could not upload file. Please try again.');
       }
     }
   };

@@ -8,7 +8,9 @@ import Cookie from 'cookie';
 import Editor from './editor';
 import Manager from './manager';
 import loadinggif from './loading.gif';
-import ErrorBoundary from './errorboundary';
+
+const backend = "https://interact-server.herokuapp.com";
+export { backend };
 
 class App extends Component
 {
@@ -22,7 +24,7 @@ class App extends Component
     {
       this.setState({ mode: this.state.mode, vid_id: this.state.vid_id, tree: this.state.tree, user: "VALIDATING", isadmin: false});
 
-      let resp = await fetch("https://interact-server.herokuapp.com/verify-token/" + cookies.session_token).then(r => r.text());
+      let resp = await fetch(backend + "/verify-token/" + cookies.session_token).then(r => r.text());
       if(resp == "VALID")
         this.setState({ mode: this.state.mode, vid_id: this.state.vid_id, tree: this.state.tree, user: cookies.session_user, isadmin: cookies.session_isadmin == "true"});
       else this.deleteCookies();
@@ -74,7 +76,7 @@ class App extends Component
 
   async updateVideo(vidid)
   {
-    let resp = await fetch("https://interact-server.herokuapp.com/get-tree/" + vidid)
+    let resp = await fetch(backend + "/get-tree/" + vidid)
                 .then(r => r.json());
     this.setState({ mode: "updating", vid_id: null, tree: null, user: this.state.user, isadmin: this.state.isadmin }, 
     function() {
@@ -106,7 +108,7 @@ class App extends Component
     }
     else if(this.state.user == "VALIDATING")
     {
-      return (<img style={{cursor: "pointer"}} onClick={() => this.toggleUserMenu()} title={"Attempting to pre-authenticate"} width="32" height="32" src={loadinggif} className="log-in"/>);
+      return (<img style={{cursor: "pointer"}} onClick={() => this.toggleUserMenu()} title="Attempting to pre-authenticate" width="32" height="32" src={loadinggif} className="log-in"/>);
     }
     else
     {

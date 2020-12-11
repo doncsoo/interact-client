@@ -2,7 +2,8 @@ import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import videoselect from './videoselect_grey.png';
 import loadingblack from './loadingblack.gif';
-import Cookies from 'cookie'
+import Cookies from 'cookie';
+import { backend } from './App';
 
 class EditorFinalize extends Component
 {
@@ -90,7 +91,7 @@ class EditorFinalize extends Component
     let list = [];
     list.push(<option value="none">None (default)</option>);
     let cookies = Cookies.parse(document.cookie)
-    let resp = await fetch("https://interact-server.herokuapp.com/get-videos/" + cookies.session_user, {cache: "no-store"})
+    let resp = await fetch(backend + "/get-videos/" + cookies.session_user, {cache: "no-store"})
         .then(r => r.json());
     console.log(resp);
     for(let vid of resp)
@@ -173,7 +174,7 @@ class EditorFinalize extends Component
     }
     this.setState({mode: this.state.mode, vid_id: this.state.vid_id, preview: "PENDING"});
     let id = this.makeid(10);
-    let response = await fetch("https://interact-server.herokuapp.com/upload-verify-image?file-name=" + id + "&file-type=" + filetype).then(r => r.json());
+    let response = await fetch(backend + "/upload-verify-image?file-name=" + id + "&file-type=" + filetype).then(r => r.json());
     this.uploadFile(file,response,id);
   }
 

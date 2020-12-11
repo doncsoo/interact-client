@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import screenfull from 'screenfull';
 import loadinggif from './loading.gif';
 import Cookie from 'cookie';
+import { backend } from './App';
 
 class Player extends Component
 {
@@ -56,6 +57,7 @@ class Player extends Component
         </div>
         <div style={{display: "none"}} id="end-title">
             <h2>The content has ended.</h2>
+            <h4 id="choicestore" style={{display: "none"}}>Your choices were stored and updated.</h4>
             <button className="white" onClick={() => this.props.app_parent.setState({ mode: "browse_main", vid_id: null, tree: null, user: this.props.app_parent.state.user })}>Return to main page</button>
         </div>
         <div style={{display: "none"}} id="error-screen">
@@ -78,7 +80,7 @@ class Player extends Component
 
     async preLaunchFunction()
     {
-        let resp = await fetch("https://interact-server.herokuapp.com/get-video/" + this.props.vid_id)
+        let resp = await fetch(backend + "/get-video/" + this.props.vid_id)
         .then(r => r.json());
         document.getElementById("like-indicator").innerHTML = resp[0].likes;
         if(resp[0].prerequisite != null)
@@ -123,7 +125,7 @@ class Player extends Component
         let resp = undefined;
         if(cookies.session_user && cookies.session_token)
         {
-            resp = await fetch("https://interact-server.herokuapp.com/prereq-choices",{
+            resp = await fetch(backend + "/prereq-choices",{
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json'
@@ -161,7 +163,7 @@ class Player extends Component
             let action = undefined;
             if(this.state.liked == true) action = "DELETE";
             else if(this.state.liked == false) action = "PUT";
-            let resp = await fetch("https://interact-server.herokuapp.com/like",{
+            let resp = await fetch(backend + "/like",{
             method: action,
             headers: {
               'Content-Type': 'application/json'
@@ -429,10 +431,10 @@ class Player extends Component
 
     async getPreRequisiteVideoComponent()
     {
-        let resp = await fetch("https://interact-server.herokuapp.com/get-video/" + this.props.vid_id)
+        let resp = await fetch(backend + "/get-video/" + this.props.vid_id)
         .then(r => r.json());
 
-        let prereq = await fetch("https://interact-server.herokuapp.com/get-video/" + resp[0].prerequisite)
+        let prereq = await fetch(backend + "/get-video/" + resp[0].prerequisite)
         .then(r => r.json());
 
         let prereq_prev = "https://interact-videos.s3.eu-central-1.amazonaws.com/previews/" + prereq[0].preview_id;
@@ -452,7 +454,7 @@ class Player extends Component
         let cookies = Cookie.parse(document.cookie);
         if(cookies.session_user != null && cookies.session_token != null)
         {
-            let resp = await fetch("https://interact-server.herokuapp.com/upload-choices",{
+            let resp = await fetch(backend + "/upload-choices",{
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json'
@@ -462,7 +464,11 @@ class Player extends Component
                        vidid: this.props.vid_id,
                        choices: this.state.choices}),
             }).then(r => r.text());
-            if(resp == "OK") console.log("choices successfully uploaded");
+            if(resp == "OK")
+            {
+                console.log("choices successfully uploaded");
+                document.getElementById("choicestore").style.display = "block";
+            }
             else console.log("choice upload failed");
         }
         else console.log("no choice uploaded - no login");

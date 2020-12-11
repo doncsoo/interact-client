@@ -172,27 +172,6 @@ class AuthTest(unittest.TestCase):
         prereq_comp = driver.find_element_by_id("prereq-missing")
         self.assertEqual("none",prereq_comp.value_of_css_property("display"))
 
-    def test_content_listing(self):
-        driver = self.driver
-        driver.get(backend_address + '/get-videos/all')
-
-        json_response = self.return_json_resp()
-
-        driver.get(frontend_address)
-        driver.implicitly_wait(3)
-        video_buttons_titles = driver.find_elements_by_xpath("//div[@id='video-button']/div[@id='attributes']/label[1]/b")
-        video_buttons_owner = driver.find_elements_by_xpath("//div[@id='video-button']/div[@id='attributes']/label[2]")
-
-        self.assertEqual(len(json_response),len(video_buttons_titles))
-        for i in range(len(json_response)):
-            json_name = json_response[i]["name"]
-            name_from_document = video_buttons_titles[i].get_attribute('innerHTML')
-            self.assertEqual(json_name, name_from_document)
-
-            json_owner = json_response[i]["owner"]
-            owner_from_document = video_buttons_owner[i].get_attribute('innerHTML')
-            self.assertEqual(json_owner, owner_from_document.replace("<b>By:</b>","").lstrip())
-
     def tearDown(self): 
         self.driver.close()
 

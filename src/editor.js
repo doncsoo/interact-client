@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import VideoUpload from './video-upload';
 import EditorContent from './editorcontent';
+import { backend } from './App';
 
 class Editor extends Component
 {
@@ -41,7 +42,7 @@ class Editor extends Component
     let obj = [];
     for(let id of this.state.videos)
     {
-      let objectURL = "http://interact-server.herokuapp.com/get-preview/" + id;
+      let objectURL = backend + "/get-preview/" + id;
       if(draggable) obj.push(<div className="drag-vid"><img className="inner-filled-video" loading="eager" title={id} vidid={id} onDragStart={(ev) => this.dragStart(ev)} draggable="true" width='139' height='80' src={objectURL}/></div>);
       else obj.push(<div className="drag-vid"><img className="inner-filled-video" loading="eager" width='139' height='80' src={objectURL}/></div>);
     }
@@ -56,7 +57,7 @@ class Editor extends Component
   async importChoices(vidid)
   {
     let impchoices = [];
-    let resp = await fetch("http://interact-server.herokuapp.com/get-tree/" + vidid, {cache: "no-store"})
+    let resp = await fetch(backend + "/get-tree/" + vidid, {cache: "no-store"})
         .then(r => r.json());
     let tree = resp[0].tree;
     if (tree.start_video.event.type == "choice")

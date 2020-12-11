@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
-import ReactDOM from 'react-dom';
 import blankpreview from './blank-preview.png';
 import Cookie from 'cookie';
+import { backend } from './App';
 
 class VideoButton extends Component
 {
@@ -51,7 +51,7 @@ class VideoButton extends Component
     {
       let status = undefined;
       let cookies = Cookie.parse(document.cookie);
-      let resp = await fetch("https://interact-server.herokuapp.com/content",{
+      let resp = await fetch(backend + "/content",{
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json'

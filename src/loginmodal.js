@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
+import { backend } from './App';
 
 class LogInModal extends Component
 {
@@ -85,7 +86,7 @@ class LogInModal extends Component
       ReactDOM.render(notification,document.getElementById("notifications"))
       return;
     }
-    let resp = await fetch("https://interact-server.herokuapp.com/user-verify",{
+    let resp = await fetch(backend + "/user-verify",{
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
@@ -126,7 +127,7 @@ class LogInModal extends Component
       return;
     }
     let status = undefined;
-    let resp = await fetch("https://interact-server.herokuapp.com/user",{
+    let resp = await fetch(backend + "/user",{
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json'

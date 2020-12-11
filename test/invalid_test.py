@@ -113,15 +113,6 @@ class InvalidTest(unittest.TestCase):
         error = driver.find_element_by_class_name('notification')
         self.assertIn("Error: This username already exists",error.get_attribute('innerHTML'))
 
-    def return_json_resp(self):
-        driver = self.driver
-        if(isinstance(driver,webdriver.Chrome)):
-            json_response = json.loads(driver.find_element_by_tag_name('pre').text)
-        elif(isinstance(driver,webdriver.Firefox)):
-            json_response = json.loads(driver.find_element_by_id('json').get_attribute('innerHTML'))
-        
-        return json_response
-
     def tearDown(self): 
         self.driver.close() 
 
