@@ -57,7 +57,7 @@ class Player extends Component
         </div>
         <div style={{display: "none"}} id="end-title">
             <h2>The content has ended.</h2>
-            <h4 id="choicestore" style={{display: "none"}}>Your choices were stored and updated.</h4>
+            <h4 id="choicestore" style={{display: "none", color: "white"}}>Your choices were stored and updated.</h4>
             <button className="white" onClick={() => this.props.app_parent.setState({ mode: "browse_main", vid_id: null, tree: null, user: this.props.app_parent.state.user })}>Return to main page</button>
         </div>
         <div style={{display: "none"}} id="error-screen">
@@ -392,7 +392,6 @@ class Player extends Component
         }
     }
 
-    //!!!Rewrite this to support start video object return
     findVideoPathObject(vidid)
     {
         for(let i = 0; i < this.state.tree.videos.length; i++)
@@ -449,27 +448,58 @@ class Player extends Component
         </div>,document.getElementById("prereq"));
     }
 
+    async checkChoicesExist()
+    {
+        let cookies = Cookie.parse(document.cookie);
+        let resp = undefined;
+        resp = await fetch(backend + "/prereq-choices",{
+            method: 'POST',
+            headers: {
+            'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                token: cookies.session_token,
+                vidid: this.props.vid_id}),
+        }).then(r => r.json());
+        console.log(resp);
+        if(resp.length == 0)
+        {
+            console.log("no choice - upload permitted");
+            return true;
+        }
+        else
+        {
+            console.log("choice exist - ask first");
+            let ret = window.confirm("You have already completed this content. Would you like to update your choices?");
+            return ret;
+        }
+    }
+
     async uploadChoices()
     {
         let cookies = Cookie.parse(document.cookie);
         if(cookies.session_user != null && cookies.session_token != null)
         {
-            let resp = await fetch(backend + "/upload-choices",{
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                       token: cookies.session_token,
-                       vidid: this.props.vid_id,
-                       choices: this.state.choices}),
-            }).then(r => r.text());
-            if(resp == "OK")
+            let upload = await this.checkChoicesExist();
+            if(upload == true)
             {
-                console.log("choices successfully uploaded");
-                document.getElementById("choicestore").style.display = "block";
+                let resp = await fetch(backend + "/upload-choices",{
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                           token: cookies.session_token,
+                           vidid: this.props.vid_id,
+                           choices: this.state.choices}),
+                }).then(r => r.text());
+                if(resp == "OK")
+                {
+                    console.log("choices successfully uploaded");
+                    document.getElementById("choicestore").style.display = "block";
+                }
+                else console.log("choice upload failed");
             }
-            else console.log("choice upload failed");
         }
         else console.log("no choice uploaded - no login");
     }
