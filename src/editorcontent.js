@@ -155,9 +155,9 @@ class EditorContent extends Component
             <label for="duration"><b>Choice Duration</b></label>
             <input type="number" onChange={(ev) => this.generateJSON("duration",this.state.selected,ev.target.value)} value={vidobj.event.duration ?? ""} name="duration" id="duration"/>
             <label for="choiceone"><b>Choice #1</b></label>
-            <input type="text" onChange={(ev) => this.generateJSON("choiceone",this.state.selected,ev.target.value)} value={vidobj.event.choices.one ?? ""} name="choiceone" id="choiceone"/>
+            <input type="text" onChange={(ev) => this.generateJSON("choiceone",this.state.selected,ev.target.value)} value={vidobj.event.choices.one ?? ""} maxlength="20" name="choiceone" id="choiceone"/>
             <label for="choicetwo"><b>Choice #2</b></label>
-            <input type="text" onChange={(ev) => this.generateJSON("choicetwo",this.state.selected,ev.target.value)} value={vidobj.event.choices.two ?? ""} name="choicetwo" id="choicetwo"/>
+            <input type="text" onChange={(ev) => this.generateJSON("choicetwo",this.state.selected,ev.target.value)} value={vidobj.event.choices.two ?? ""} maxlength="20" name="choicetwo" id="choicetwo"/>
             <label><b>Please drag and drop the correct videos in the editor!</b></label>
           </div>
         )
