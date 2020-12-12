@@ -39,6 +39,7 @@ class LogInModal extends Component
           <label for="psw"><b>Password</b></label>
           <input type="password" placeholder="Enter Password" name="psw" id="psw" required/>
           <br/>
+          <label style={{fontSize:"14px"}}>With logging in, you agree to storing cookies on your device.</label>
           <button onClick={() => this.attemptLogIn()} id="loginbutton" className="black">Login</button>
           <br/>
         </div>

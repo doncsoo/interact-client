@@ -16,6 +16,7 @@ class EditorContent extends Component
       super(props);
       if(props.vid_id == null) this.state = {tree_status: props.editor_parent.state.tree_status, selected: null, butterfly_selected: null};
       else this.state = {tree_status: {"video_title": "", "start_video": null, "videos": []}, selected: null, butterfly_selected: null};
+      window.dev_pipe = this;
   }
 
   async componentDidMount()
@@ -51,9 +52,9 @@ class EditorContent extends Component
   {
       let savebutton = null;
       if(this.props.vid_id != null)
-      savebutton = <button onClick={() => ReactDOM.render(<EditorFinalize parent={this} editsave={true}/>,document.getElementById("popup"))} className="white save-button"><h1 style={{color: "black", margin: "0px"}}>Save</h1></button>;
+      savebutton = <button onClick={() => ReactDOM.render(<EditorFinalize parent={this} editsave={true}/>,document.getElementById("popup"))} className="white save-button"><h1 style={{margin: "0px"}}>Save</h1></button>;
       else
-      savebutton = <button onClick={() => this.treeValidation()} className="white save-button"><h1 style={{color: "black", margin: "0px"}}>Upload</h1></button>;
+      savebutton = <button onClick={() => this.treeValidation()} className="white save-button"><h1 style={{margin: "0px"}}>Upload</h1></button>;
       return (
           <div>
             <button onClick={() => this.toggleNavigation()} style={{position: "absolute", top: "7%", left: "1%", zIndex: "1"}} className="white">Navigate</button>
@@ -63,7 +64,6 @@ class EditorContent extends Component
             <div className="editor-content">
               {this.getEditorByJSON()}
             </div>
-            {/*<button style={{position: "absolute", top: "90%", left: "85%"}} onClick={() => alert(JSON.stringify(this.state.tree_status))} className="white">Show content JSON</button>*/}
             {savebutton}
             <div className="editor-videos">
               <button style={{display: "block"}} onClick={() => this.props.editor_parent.setState({mode: "upload", tree_status: this.state.tree_status, videos: this.props.editor_parent.state.videos, imported: this.props.editor_parent.state.imported})} className="white">Upload videos</button>
@@ -73,6 +73,12 @@ class EditorContent extends Component
             <div id="popup"/>
           </div>
       )
+  }
+
+  //dev function, call from console: window.dev_pipe.printTreeJSON()
+  printTreeJSON()
+  {
+    return this.state.tree_status;
   }
 
   async prereqPopUp()
@@ -90,11 +96,12 @@ class EditorContent extends Component
 
     ReactDOM.render(
       <div className="modal">
-        <div className="modal-content3 animate">
+        <div className="modal-content2 animate">
           <button style={{margin: "5px", display: "inline"}} onClick={() => ReactDOM.unmountComponentAtNode(document.getElementById("popup"))} className="closeblack"/>
-          <div id="logincontainer">
+          <div className="logincontainer">
             <h2 style={{color: "black"}}>Select an existing content!</h2>
             <select id="prereq_list">{list}</select>
+            <br/>
             <button onClick={() => { this.props.editor_parent.importChoices(document.getElementById("prereq_list").value) 
                                      ReactDOM.unmountComponentAtNode(document.getElementById("popup"))}} className="black">Import</button>
           </div>
