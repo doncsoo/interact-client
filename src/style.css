@@ -645,6 +645,14 @@ color: white;
 
 .inner-filled-video {
   border-radius: 5px;
+  background-image: url('blank-preview.png');
+  background-size: cover;
+}
+
+.navigation-video {
+  border-radius: 5px;
+  background-image: url('blank-preview.png');
+  background-size: cover;
 }
 
 .inner-filled-video:hover {

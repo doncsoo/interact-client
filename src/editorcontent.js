@@ -134,7 +134,7 @@ class EditorContent extends Component
         <input type="text" onChange={(ev) => this.generateJSON("title",this.state.selected, ev.target.value)} value={vidobj.title ?? ""} name="title" id="title"/>
         <label for="event"><b>Event</b></label>
         <select onChange={(ev) => this.generateJSON("event",this.state.selected,ev.target.value)} value={vidobj.event ? (vidobj.event.type) : ""} name="event" id="event">
-          <option value="none">Select one!</option>
+          <option value="none">None</option>
           <option value="choice">Choice</option>
           <option value="butterfly">Butterfly</option>
           <option value="linear">Linear</option>
@@ -296,7 +296,9 @@ class EditorContent extends Component
           ptr.event = {type: "butterfly", required_choices: [], gateway: []};
         }
         else if(data == "linear")
-          ptr.event = {type: "linear", gateway: null};
+          ptr.event = {type: "linear", gateway: null}
+        else if(data == "none")
+          ptr.event = null;
         break;
       case "choiceone":
         ptr.event.choices.one = data;
@@ -481,13 +483,13 @@ class EditorContent extends Component
     {
       let start_url = "http://interact-server.herokuapp.com/get-preview/" + this.state.tree_status.start_video.id;
       navigation_buttons.push(
-        <button style={{border: "none", background: "none"}} onClick={(ev) => this.setState({tree_status: this.state.tree_status, selected: "start_video", butterfly_selected: null})}><div style={{display: "flex"}}><img style={{borderRadius: "5px"}} vidid={this.state.tree_status.start_video.id} onDragStart={(ev) => this.dragStart(ev)} draggable="true" width='139' height='80' src={start_url}/><h3 style={{color: "black", paddingLeft: "5px"}}>{this.state.tree_status.start_video.title ?? "<no title>"}</h3><label>START</label></div></button>);
+        <button style={{border: "none", background: "none"}} onClick={(ev) => this.setState({tree_status: this.state.tree_status, selected: "start_video", butterfly_selected: null})}><div style={{display: "flex"}}><img className="navigation-video" vidid={this.state.tree_status.start_video.id} onDragStart={(ev) => this.dragStart(ev)} draggable="true" width='139' height='80' src={start_url}/><h3 style={{color: "black", paddingLeft: "5px"}}>{this.state.tree_status.start_video.title ?? "<no title>"}</h3><label>START</label></div></button>);
       for(let video of this.state.tree_status.videos)
       {
         navigation_buttons.push(<br/>);
         let url = "http://interact-server.herokuapp.com/get-preview/" + video.id;
         navigation_buttons.push(
-          <button style={{border: "none", background: "none"}} onClick={(ev) => this.setState({tree_status: this.state.tree_status, selected: video.id, butterfly_selected: null})}><div style={{display: "flex"}}><img style={{borderRadius: "5px"}} vidid={video.id} onDragStart={(ev) => this.dragStart(ev)} draggable="true" width='139' height='80' src={url}/><h3 style={{color: "black", paddingLeft: "5px"}}>{video.title ?? "<no title>"}</h3></div></button>);
+          <button style={{border: "none", background: "none"}} onClick={(ev) => this.setState({tree_status: this.state.tree_status, selected: video.id, butterfly_selected: null})}><div style={{display: "flex"}}><img className="navigation-video" vidid={video.id} onDragStart={(ev) => this.dragStart(ev)} draggable="true" width='139' height='80' src={url}/><h3 style={{color: "black", paddingLeft: "5px"}}>{video.title ?? "<no title>"}</h3></div></button>);
       }
       return navigation_buttons;
     }
